@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Passo 1 - Comunicado ao Sindicato</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 4rem; /* Espaço para o botão fixo */
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .logo-empresa {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin-right: 1rem;
+    }
+
+    .logo-placeholder {
+      width: 100px;
+      height: 100px;
+      background-color: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+      text-align: center;
+    }
+
+    .header-text {
+      flex: 1;
+    }
+
+    .titulo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: green;
+      margin: 0;
+    }
+
+    .gestao {
+      font-size: 1rem;
+      color: #555;
+      margin-top: 0.5rem;
+    }
+
+    .form-container {
+      margin-top: 76px; /* ~2cm, mantido para acompanhar assinatura */
+      text-align: center;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background-color: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button:hover {
+      background-color: #005a00;
+    }
+
+    .back-icon {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      font-size: 24px;
+      color: green;
+      cursor: pointer;
+      z-index: 1000;
+      transition: color 0.2s;
+    }
+
+    .back-icon:hover {
+      color: #005a00;
+    }
+
+    .preview {
+      border: 1px solid #e0e0e0;
+      padding: 1rem;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .preview-data {
+      text-align: right;
+      margin-top: 50px; /* ~1,32 cm */
+      font-size: 1rem;
+      padding-right: 38px; /* ~1cm em 96dpi */
+    }
+
+    .signature {
+      margin-top: 150px; /* ~4 cm */
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .signature div {
+      width: 48%;
+      text-align: center;
+    }
+
+    .signature-line {
+      border-bottom: 2px solid #000;
+      width: 200px;
+      margin: 0.5rem auto;
+      max-width: 100%;
+    }
+
+    .signature p {
+      margin: 0.5rem 0 0;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Ícone de Voltar Minimalista -->
+  <span id="back-icon" class="back-icon material-icons" onclick="irPara('ProcEleitoral.html')" title="Voltar ao Processo Eleitoral">arrow_back</span>
+
+  <div class="container">
+    <div class="header">
+      <img id="logo-empresa" class="logo-empresa" style="display: none;" alt="Logo da Empresa">
+      <div id="logo-placeholder" class="logo-placeholder">Logo da Empresa</div>
+      <div class="header-text">
+        <div class="titulo">Comunicado ao Sindicato</div>
+        <div class="gestao" id="gestaoText">CIPA Gestão [Ano] / [Ano + 1]</div>
+      </div>
+    </div>
+
+    <div class="preview" id="previewText">[Carregando texto do comunicado...]</div>
+    <div class="preview-data" id="previewData"></div>
+
+    <div class="signature">
+      <div>
+        <div class="signature-line"></div>
+        <p>Representante da Empresa</p>
+      </div>
+      <div>
+        <div class="signature-line"></div>
+        <p>Presidente da CIPA em Curso</p>
+      </div>
+    </div>
+
+    <div class="form-container">
+      <button onclick="gerarDocumento()"><span class="material-icons">file_download</span> Gerar Documento Word</button>
+    </div>
+  </div>
+
+  <script>
+    console.log("Iniciando carregamento de passo1.html...");
+    if (typeof docx === 'undefined') {
+      console.warn("Biblioteca docx.js não carregada inicialmente.");
+    } else {
+      console.log("Biblioteca docx.js carregada com sucesso.");
+    }
+
+    function irPara(pagina) {
+      console.log("Redirecionando para:", pagina);
+      window.location.href = pagina;
+    }
+
+    function getDataFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      console.log("Parâmetros da URL:", params.toString());
+      return {
+        data: params.get('data'),
+        sindicato: params.get('sindicato')
+      };
+    }
+
+    function formatarData(data) {
+      const meses = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      ];
+      const dia = data.getDate();
+      const mes = meses[data.getMonth()];
+      const ano = data.getFullYear();
+      return `${dia} de ${mes} de ${ano}`;
+    }
+
+    function loadEmpresaData() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa_basica')) || {};
+        console.log("Dados da empresa carregados de 'empresa_basica':", empresaData);
+        return {
+          nome: empresaData.nome || '',
+          cnpj: empresaData.cnpj || '',
+          cnae: empresaData.cnae || '',
+          endereco: empresaData.endereco || '',
+          logo: empresaData.logo || ''
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados da empresa:", e);
+        return {
+          nome: '',
+          cnpj: '',
+          cnae: '',
+          endereco: '',
+          logo: ''
+        };
+      }
+    }
+
+    function loadAssinaturaData() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa')) || {};
+        console.log("Dados de assinatura carregados de 'empresa':", empresaData);
+        return {
+          repEmpresa: empresaData.repEmpresa || 'Não informado',
+          repCipa: empresaData.repCipa || 'Não informado'
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados de assinatura:", e);
+        return {
+          repEmpresa: 'Não informado',
+          repCipa: 'Não informado'
+        };
+      }
+    }
+
+    function atualizarTextos() {
+      const { data: dataStr, sindicato } = getDataFromUrl();
+      const empresaData = loadEmpresaData();
+      console.log("Dados recebidos:", { dataStr, sindicato, empresaData });
+
+      if (!dataStr || !sindicato) {
+        document.getElementById('previewText').textContent = "Erro: Dados incompletos (falta data ou sindicato). Volte ao calendário e clique no ícone de lápis da primeira linha.";
+        document.getElementById('previewData').textContent = "";
+        console.error("Erro: Dados incompletos (data ou sindicato ausente).");
+        return;
+      }
+
+      const data = new Date(dataStr);
+      if (isNaN(data.getTime())) {
+        document.getElementById('previewText').textContent = "Erro: Data inválida fornecida.";
+        document.getElementById('previewData').textContent = "";
+        console.error("Erro: Data inválida:", dataStr);
+        return;
+      }
+
+      // Verificar quais dados da empresa estão faltando
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        document.getElementById('previewText').textContent = `Erro: Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`;
+        document.getElementById('previewData').textContent = "";
+        console.error("Erro: Dados da empresa incompletos:", missingFields);
+        return;
+      }
+
+      // Carregar logotipo
+      const logoImg = document.getElementById('logo-empresa');
+      const logoPlaceholder = document.getElementById('logo-placeholder');
+      if (empresaData.logo) {
+        logoImg.src = empresaData.logo;
+        logoImg.style.display = 'block';
+        logoPlaceholder.style.display = 'none';
+        console.log("Logotipo carregado com sucesso.");
+      } else {
+        logoImg.style.display = 'none';
+        logoPlaceholder.style.display = 'flex';
+        console.log("Nenhum logotipo encontrado, exibindo placeholder.");
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      document.getElementById('gestaoText').textContent = `CIPA Gestão ${anoInicio} / ${anoFim}`;
+
+      const dataFormatada = formatarData(data);
+      const texto = `Ao ${decodeURIComponent(sindicato)},\n\n` +
+        `A ${empresaData.nome}, inscrita sob o CNPJ ${empresaData.cnpj} e CNAE ${empresaData.cnae}, localizada na ${empresaData.endereco}, tem a honra de comunicar o início do processo eleitoral para a formação da CIPA - Comissão Interna de Prevenção de Acidentes e Assédio desta instituição.\n\n` +
+        `Para registro e protocolo, estamos encaminhando:\n\n` +
+        `Edital de Convocação para Eleição\n\n` +
+        `O edital contém todas as informações relevantes para o processo eleitoral. Ressaltamos que os demais editais e documentos relacionados ao processo serão enviados ao Sindicato após a conclusão das eleições e a posse da nova CIPA.\n\n` +
+        `Agradecemos pela atenção dispensada a este comunicado e colocamo-nos à disposição para eventuais esclarecimentos.`;
+
+      document.getElementById('previewText').textContent = texto;
+      document.getElementById('previewData').textContent = dataFormatada;
+      console.log("Texto, data e logotipo atualizados com sucesso.");
+    }
+
+    function gerarDocumento() {
+      console.log("Iniciando geração do documento Word...");
+      if (typeof docx === 'undefined') {
+        console.error("Erro: Biblioteca docx.js não carregada.");
+        alert("Erro: Não foi possível carregar a biblioteca para gerar o documento. Verifique sua conexão à internet, tente outro navegador ou contate o suporte.");
+        return;
+      }
+
+      const { data: dataStr, sindicato } = getDataFromUrl();
+      const empresaData = loadEmpresaData();
+      const assinaturaData = loadAssinaturaData();
+
+      if (!dataStr || !sindicato) {
+        console.error("Erro ao gerar documento: Dados incompletos.");
+        alert("Dados incompletos. Volte ao calendário e clique no ícone de lápis da primeira linha.");
+        return;
+      }
+
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        console.error("Erro ao gerar documento: Dados da empresa incompletos:", missingFields);
+        alert(`Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`);
+        return;
+      }
+
+      const data = new Date(dataStr);
+      if (isNaN(data.getTime())) {
+        console.error("Erro ao gerar documento: Data inválida:", dataStr);
+        alert("Data inválida fornecida.");
+        return;
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      const dataFormatada = formatarData(data);
+      const sindicatoNome = decodeURIComponent(sindicato);
+
+      try {
+        // Função para converter base64 para ArrayBuffer
+        function base64ToArrayBuffer(base64) {
+          const binaryString = window.atob(base64.split(',')[1]);
+          const len = binaryString.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          return bytes.buffer;
+        }
+
+        // Configurar bordas invisíveis
+        const invisibleBorders = {
+          top: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          bottom: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          left: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          right: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" }
+        };
+
+        // Configurar o cabeçalho
+        const headerChildren = [
+          new docx.Table({
+            rows: [
+              new docx.TableRow({
+                children: [
+                  new docx.TableCell({
+                    width: { size: 1000, type: docx.WidthType.DXA },
+                    children: empresaData.logo ? [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.ImageRun({
+                            data: base64ToArrayBuffer(empresaData.logo),
+                            transformation: { width: 50, height: 50 }
+                          })
+                        ],
+                        alignment: docx.AlignmentType.LEFT
+                      })
+                    ] : [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: "Logo da Empresa",
+                            size: 12,
+                            font: "Arial",
+                            color: "555555"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.LEFT
+                      })
+                    ],
+                    borders: invisibleBorders
+                  }),
+                  new docx.TableCell({
+                    width: { size: 8000, type: docx.WidthType.DXA },
+                    children: [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: "Comunicado ao Sindicato",
+                            bold: true,
+                            size: 36,
+                            font: "Arial",
+                            color: "008000"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.CENTER
+                      }),
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: `CIPA Gestão ${anoInicio} / ${anoFim}`,
+                            size: 20,
+                            font: "Arial",
+                            color: "555555"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.CENTER,
+                        spacing: { after: 200 }
+                      })
+                    ],
+                    borders: invisibleBorders
+                  })
+                ]
+              })
+            ],
+            width: { size: 100, type: docx.WidthType.PERCENTAGE }
+          })
+        ];
+
+        const doc = new docx.Document({
+          sections: [{
+            headers: {
+              default: new docx.Header({
+                children: headerChildren
+              })
+            },
+            properties: {},
+            children: [
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `Ao ${sindicatoNome},`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { before: 880, after: 400 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `A ${empresaData.nome}, inscrita sob o CNPJ ${empresaData.cnpj} e CNAE ${empresaData.cnae}, localizada na ${empresaData.endereco}, tem a honra de comunicar o início do processo eleitoral para a formação da CIPA - Comissão Interna de Prevenção de Acidentes e Assédio desta instituição.`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `Para registro e protocolo, estamos encaminhando:`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `Edital de Convocação para Eleição`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `O edital contém todas as informações relevantes para o processo eleitoral. Ressaltamos que os demais editais e documentos relacionados ao processo serão enviados ao Sindicato após a conclusão das eleições e a posse da nova CIPA.`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `Agradecemos pela atenção dispensada a este comunicado e colocamo-nos à disposição para eventuais esclarecimentos.`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 400 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: dataFormatada,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                alignment: docx.AlignmentType.RIGHT,
+                indent: { right: 567 },
+                spacing: { before: 1440, after: 1920 }
+              }),
+              new docx.Table({
+                rows: [
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 50, type: docx.WidthType.PERCENTAGE },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "____________________",
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 100 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: assinaturaData.repEmpresa,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 100 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Representante da Empresa",
+                                size: 20,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER
+                          })
+                        ],
+                        borders: invisibleBorders
+                      }),
+                      new docx.TableCell({
+                        width: { size: 50, type: docx.WidthType.PERCENTAGE },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "____________________",
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 100 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: assinaturaData.repCipa,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 100 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Presidente da CIPA em Curso",
+                                size: 20,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER
+                          })
+                        ],
+                        borders: invisibleBorders
+                      })
+                    ]
+                  })
+                ],
+                width: { size: 100, type: docx.WidthType.PERCENTAGE }
+              })
+            ]
+          }]
+        });
+
+        docx.Packer.toBlob(doc).then(blob => {
+          console.log("Documento Word gerado com sucesso.");
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "Comunicado_Sindicato.docx";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }).catch(error => {
+          console.error("Erro ao gerar o documento Word:", error);
+          alert("Erro ao gerar o documento. Verifique o console para detalhes.");
+        });
+      } catch (error) {
+        console.error("Erro ao criar o documento:", error);
+        alert("Erro ao criar o documento. Verifique o console para detalhes.");
+      }
+    }
+
+    window.onload = () => {
+      console.log("Carregando passo1.html...");
+      atualizarTextos();
+    };
+  </script>
+</body>
+</html>

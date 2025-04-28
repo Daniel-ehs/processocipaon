@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendário CIPA</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #f9f9f9;
+    }
+
+    .tabela-cabecalho {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-bottom: 2rem;
+    }
+
+    .tabela-cabecalho td {
+      border: none;
+      vertical-align: middle;
+      padding: 0.5rem;
+    }
+
+    .logo-container {
+      text-align: center;
+      vertical-align: middle;
+      height: 100%;
+      transform: translateX(1cm);
+    }
+
+    .logo-cipa {
+      width: 100px;
+      height: auto;
+    }
+
+    .conteudo-container {
+      text-align: center;
+      transform: translateX(-0.5cm);
+    }
+
+    .titulo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: green;
+      margin-bottom: 0.5rem;
+    }
+
+    .data-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.2rem;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input[type="date"] {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .icone-lixeira {
+      font-size: 1.2rem;
+      color: red;
+      cursor: pointer;
+      margin: 0 0.5rem;
+    }
+
+    .icone-lixeira:hover {
+      color: #cc0000;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background-color: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .tabela-container {
+      display: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+      font-size: 8pt;
+    }
+
+    th, td {
+      border: 1px solid #999;
+      padding: 0.4rem;
+      vertical-align: middle;
+    }
+
+    th {
+      background-color: #f0f0f0;
+      text-align: center;
+    }
+
+    .centralizado {
+      text-align: center;
+    }
+
+    .acoes {
+      border: none;
+      background-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.5rem;
+    }
+
+    .linha-concluida td:not(.sem-borda) {
+      background-color: #c8f7c5 !important;
+      text-decoration: line-through;
+      color: #555;
+    }
+
+    .icone-lapis {
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .sem-borda {
+      border: none !important;
+      background-color: transparent !important;
+    }
+
+    tr.linha-concluida td.sem-borda {
+      background-color: transparent !important;
+      text-decoration: none !important;
+      color: inherit !important;
+    }
+
+    #botaoImprimir {
+      font-size: 1.3rem;
+      line-height: 1.3rem;
+      padding: 0.2rem;
+      color: green;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: none;
+    }
+
+    .btn-voltar {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      font-size: 1.5rem;
+      color: #28a745;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-voltar:hover {
+      color: #218838;
+      transform: translateY(-2px);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    @media print {
+      body {
+        margin: 0;
+        background-color: white;
+      }
+
+      .data-container > label,
+      .data-container > input,
+      .data-container > button,
+      .data-container > .icone-lixeira,
+      .acoes,
+      #botaoImprimir,
+      .btn-voltar {
+        display: none !important;
+      }
+
+      .tabela-cabecalho {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin-bottom: 2rem;
+      }
+
+      .tabela-cabecalho td {
+        border: none;
+        vertical-align: middle;
+        padding: 0.5rem;
+      }
+
+      .logo-container {
+        text-align: center;
+        vertical-align: middle;
+        height: 100%;
+        transform: translateX(1cm);
+      }
+
+      .logo-cipa {
+        width: 100px;
+        height: auto;
+      }
+
+      .conteudo-container {
+        text-align: center;
+        transform: translateX(-0.5cm);
+      }
+
+      .titulo {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: green;
+        margin-bottom: 0.5rem;
+      }
+
+      .data-container {
+        display: block;
+        text-align: center;
+        margin-top: 0.2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      #dataPosseTexto {
+        display: block !important;
+        font-size: 1rem;
+      }
+
+      .tabela-container {
+        display: block !important;
+      }
+
+      #tabelaCalendario {
+        font-size: 8pt;
+        width: 100%;
+      }
+
+      #colunaAcoes,
+      #tabelaCalendario td.sem-borda {
+        display: none !important;
+      }
+
+      @page {
+        size: landscape;
+        margin: 1cm;
+      }
+    }
+  </style>
+</head>
+<body>
+  <span class="material-icons btn-voltar" onclick="irPara('index.html')">arrow_back</span>
+  <table class="tabela-cabecalho">
+    <tr>
+      <td rowspan="2" style="width: 120px;" class="logo-container">
+        <img src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" class="logo-cipa" alt="Logo CIPA">
+      </td>
+      <td class="conteudo-container">
+        <div class="titulo">Calendário de Processo Eleitoral da CIPA</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="conteudo-container">
+        <div class="data-container">
+          <label for="dataPosse">Data de Posse da CIPA Atual:</label>
+          <input type="date" id="dataPosse" min="1900-01-01" max="2100-12-31" onkeypress="verificarEnter(event)">
+          <span class="material-icons icone-lixeira" onclick="limparData()">delete</span>
+          <span id="dataPosseTexto" style="display: none;"></span>
+          <button onclick="gerarCalendario()">Gerar Calendário</button>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="tabela-container" id="tabelaContainer">
+    <table id="tabelaCalendario">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Prazos Legais</th>
+          <th class="centralizado">Data</th>
+          <th class="centralizado">Dia da Semana</th>
+          <th class="sem-borda" id="colunaAcoes">
+            <button id="botaoImprimir" onclick="imprimirCalendario()" title="Imprimir calendário"><span class="material-icons">print</span></button>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="corpoTabela"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const eventos = [
+      { item: "COMUNICAR INÍCIO DO PROCESSO ELEITORAL AO SINDICATO", diasAntes: 65, prazoLegal: "COMUNICAR SINDICATO PREPONDERANTE CONFORME NR 5 (ITEM 5.5.1.1)", pagina: "Pagina1.html", requerSindicato: true },
+      { item: "CONVOCAÇÃO PARA ELEIÇÃO (PUBLICAÇÃO)", diasAntes: 60, prazoLegal: "MÍNIMO DE 60 DIAS ANTES DO TÉRMINO DO MANDATO EM CURSO (NR 5.5.1)", pagina: "Pagina2.html", requerSindicato: false },
+      { item: "FORMAÇÃO DA COMISSÃO ELEITORAL (PUBLICAÇÃO)", diasAntes: 55, prazoLegal: "NÃO DEFINIDO CONFORME NR 5 (ITEM 5.5.2). USADO POR PADRÃO 55 DIAS ANTES DA ELEIÇÃO", pagina: "Pagina3.html", requerSindicato: false },
+      { item: "INÍCIO DAS INSCRIÇÕES DE CANDIDATOS", diasAntes: 50, prazoLegal: "NÃO DEFINIDO CONFORME NR 5 (ITEM 5.5.3 ALÍNEA B). USADO POR PADRÃO 20 DIAS ANTES DA ELEIÇÃO", pagina: "Pagina4.html", requerSindicato: false },
+      { item: "TÉRMINO DAS INSCRIÇÕES DE CANDIDATOS", diasAntes: 35, prazoLegal: "MÍNIMO DE INSCRIÇÃO 15 DIAS CONFORME NR 5 (ITEM 5.5.3 ALÍNEA B)." },
+      { item: "DIVULGAÇÃO DOS INSCRITOS", diasAntes: 34, prazoLegal: "NÃO DEFINIDO CONFORME NR 5 (ITEM 5.5.3 ALÍNEA E). USADO POR PADRÃO 1 DIA APÓS O TÉRMINO DAS INSCRIÇÕES", pagina: "Pagina5.html", requerSindicato: false },
+      { item: "REALIZAÇÃO DA ELEIÇÃO (VOTAÇÃO)", diasAntes: 30, prazoLegal: "MÍNIMO DE 30 DIAS ANTES DO TÉRMINO DO MANDATO EM CURSO SE HOUVER (NR 5.5.3 ALÍNEA F)", pagina: "Pagina6.html", requerSindicato: false },
+      { item: "REALIZAÇÃO DA APURAÇÃO", diasAntes: 30, prazoLegal: "NÃO DEFINIDO CONFORME NR 5 (ITEM 5.5.3 ALÍNEA I). USADO POR PADRÃO MESMO DIA DA VOTAÇÃO", pagina: "Pagina7.html", requerSindicato: false },
+      { item: "RESULTADO DA ELEIÇÃO - ATA DA ELEIÇÃO", diasAntes: 29, prazoLegal: "NÃO DEFINIDO CONFORME NR 5 (ITEM 5.5.8), USADO POR PADRÃO 1 DIA APÓS A APURAÇÃO", pagina: "Pagina8.html", requerSindicato: false },
+      { item: "CURSO PARA CIPEIROS (DATA MÍNIMA)", diasAntes: 29, prazoLegal: "NÃO DEFINIDO CONFORME NR 5 (ITEM 5.7.1), USADO POR PADRÃO COMO PRAZO MÍNIMO 1 DIA APÓS A APURAÇÃO", pagina: "Pagina9.html", requerSindicato: false },
+      { item: "CURSO DA CIPA (DATA MÁXIMA)", diasAntes: 1, prazoLegal: "NÃO DEFINIDO CONFORME NR 5 (ITEM 5.7.1), USADO POR PADRÃO COMO PRAZO MÁXIMO 1 DIA DO TÉRMINO DO MANDATO EM CURSO." },
+      { item: "TÉRMINO DO MANDATO DA CIPA EM CURSO", diasAntes: 0, prazoLegal: "1 ANO APÓS A POSSE DO MANDATO EM CURSO (NR 5.4.6)" },
+      { item: "REALIZAÇÃO DA POSSE - ATA DE POSSE NOVOS MEMBROS", diasAntes: 0, prazoLegal: "NÃO DEFINIDO CONFORME NR 5 (ITEM 5.4.8), USADO POR PADRÃO 1 DIA APÓS O TÉRMINO DO MANDATO EM CURSO", pagina: "Pagina10.html", requerSindicato: false },
+      { item: "ORGANIZAÇÃO DO CALENDÁRIO REUNIÕES MENSAIS", diasAntes: 0, prazoLegal: "NÃO DEFINIDO CONFORME NR 5 (ITEM 5.6.1), POR PADRÃO É FEITO NA REUNIÃO DE INSTALAÇÃO E POSSE", pagina: "Pagina11.html", requerSindicato: false },
+      { item: "COMUNICAR AO SINDICATO DO RESULTADO E DATA POSSE", diasAntes: -1, prazoLegal: "NÃO DEFINIDO NA NR 5 (VER NA CONVENÇÃO COLETIVA A NECESSIDADE), COMO BOA PRÁTICA PROTOCOLAR EDITAIS", pagina: "Pagina12.html", requerSindicato: false }
+    ];
+
+    function validarData(dataInput) {
+      console.log("Validando data:", dataInput);
+      if (!dataInput) {
+        alert("Por favor, insira uma data de posse válida (ex.: 15/06/2025).");
+        return false;
+      }
+      const data = new Date(dataInput);
+      if (isNaN(data.getTime())) {
+        alert("A data inserida não é válida. Use o formato DD/MM/AAAA (ex.: 15/06/2025).");
+        return false;
+      }
+      const ano = data.getFullYear();
+      if (ano < 1900 || ano > 2100 || String(ano).length !== 4) {
+        alert("O ano deve ter exatamente 4 dígitos e estar entre 1900 e 2100 (ex.: 2025).");
+        return false;
+      }
+      return true;
+    }
+
+    function abrirPasso(pagina, dataEvento) {
+      console.log("Abrindo passo com sindicato:", pagina, dataEvento);
+      const sindicato = prompt("Digite o nome do Sindicato Preponderante:");
+      if (!sindicato || sindicato.trim() === "") {
+        alert("Por favor, insira um nome válido para o sindicato.");
+        return;
+      }
+      const url = `${pagina}?data=${dataEvento}&sindicato=${encodeURIComponent(sindicato)}`;
+      console.log("Redirecionando para:", url);
+      window.location.href = url;
+    }
+
+    function abrirPassoSimples(pagina, dataEvento) {
+      const url = `${pagina}?data=${dataEvento}`;
+      console.log("Abrindo passo simples:", url);
+      window.location.href = url;
+    }
+
+    function limparData() {
+      const dataInput = document.getElementById('dataPosse');
+      const tabelaContainer = document.getElementById('tabelaContainer');
+      const botaoImprimir = document.getElementById('botaoImprimir');
+      const dataPosseTexto = document.getElementById('dataPosseTexto');
+
+      dataInput.value = '';
+      tabelaContainer.style.display = 'none';
+      botaoImprimir.style.display = 'none';
+      dataPosseTexto.textContent = '';
+      localStorage.removeItem('dataPosse');
+    }
+
+    function gerarCalendario() {
+      const dataInput = document.getElementById('dataPosse').value;
+      console.log("Gerando calendário com data:", dataInput);
+      if (!validarData(dataInput)) {
+        return;
+      }
+
+      localStorage.setItem('dataPosse', dataInput);
+
+      const dataPosse = new Date(dataInput);
+      const dataBase = new Date(dataPosse);
+      dataBase.setFullYear(dataBase.getFullYear() + 1);
+
+      const dataFormatada = dataPosse.toLocaleDateString('pt-BR');
+      document.getElementById('dataPosseTexto').textContent = `Data de Posse da CIPA Atual: ${dataFormatada}`;
+
+      const corpoTabela = document.getElementById("corpoTabela");
+      corpoTabela.innerHTML = "";
+
+      eventos.forEach((evento, index) => {
+        let dataEvento = new Date(dataBase);
+        dataEvento.setDate(dataEvento.getDate() - evento.diasAntes);
+
+        while (dataEvento.getDay() === 0 || dataEvento.getDay() === 6) {
+          dataEvento.setDate(dataEvento.getDate() - 1);
+        }
+
+        const dataFormatada = dataEvento.toLocaleDateString('pt-BR');
+        const diaSemana = dataEvento.toLocaleDateString('pt-BR', { weekday: 'long' });
+
+        const idLinha = `linha-${index}`;
+        const idCheckbox = `check-${index}`;
+        const idLapis = `lapis-${index}`;
+
+        const lapisHtml = evento.pagina
+          ? `<span class="icone-lapis" id="${idLapis}" onclick="${evento.requerSindicato ? 'abrirPasso' : 'abrirPassoSimples'}('${evento.pagina}', '${dataEvento.toISOString().split('T')[0]}')">✏️</span>`
+          : '';
+
+        console.log(`Gerando lápis para ${evento.item}: ${lapisHtml}`);
+
+        const linha = document.createElement("tr");
+        linha.id = idLinha;
+
+        linha.innerHTML = `
+          <td>${evento.item}</td>
+          <td>${evento.prazoLegal}</td>
+          <td class="centralizado">${dataFormatada}</td>
+          <td class="centralizado">${diaSemana}</td>
+          <td class="sem-borda">
+            <div class="acoes">
+              <input type="checkbox" id="${idCheckbox}" onchange="marcarLinha('${idLinha}', '${idCheckbox}', '${idLapis}')">
+              ${lapisHtml}
+            </div>
+          </td>
+        `;
+
+        corpoTabela.appendChild(linha);
+      });
+
+      document.getElementById("tabelaContainer").style.display = "block";
+      document.getElementById("botaoImprimir").style.display = "inline";
+    }
+
+    function verificarEnter(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        console.log("Tecla Enter pressionada");
+        gerarCalendario();
+      }
+    }
+
+    function marcarLinha(idLinha, idCheckbox, idLapis) {
+      const linha = document.getElementById(idLinha);
+      const checkbox = document.getElementById(idCheckbox);
+      const lapis = document.getElementById(idLapis);
+
+      if (checkbox.checked) {
+        linha.classList.add("linha-concluida");
+        if (lapis) lapis.style.display = "none";
+      } else {
+        linha.classList.remove("linha-concluida");
+        if (lapis) lapis.style.display = "inline";
+      }
+    }
+
+    function imprimirCalendario() {
+      window.print();
+    }
+
+    function irPara(pagina) {
+      console.log("Redirecionando para:", pagina);
+      window.location.href = pagina;
+    }
+
+    // Restaurar data salva ao carregar a página
+    window.onload = function() {
+      const dataSalva = localStorage.getItem('dataPosse');
+      if (dataSalva) {
+        document.getElementById('dataPosse').value = dataSalva;
+        gerarCalendario();
+      }
+    };
+  </script>
+</body>
+</html>

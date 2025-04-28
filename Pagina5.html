@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Passo 5 - Edital de Divulgação de Inscritos</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; background-color: #f9f9f9; display: flex; flex-direction: column; align-items: center; }
+    .container { max-width: 800px; width: 100%; background-color: white; padding: 2rem; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-top: 4rem; }
+    .header { display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; text-align: center; }
+    .logo-empresa { width: 100px; height: 100px; object-fit: contain; margin-right: 1rem; }
+    .logo-placeholder { width: 100px; height: 100px; background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; margin-right: 1rem; font-size: 0.9rem; color: #555; text-align: center; }
+    .header-text { flex: 1; }
+    .titulo { font-size: 1.8rem; font-weight: bold; color: green; margin: 0; }
+    .gestao { font-size: 1rem; color: #555; margin-top: 0.5rem; }
+    .form-container { margin-top: 76px; text-align: center; display: flex; justify-content: center; gap: 1rem; }
+    button { padding: 0.65rem 1.3rem; font-size: 1.02rem; background-color: green; color: white; border: none; cursor: pointer; border-radius: 5px; display: inline-flex; align-items: center; gap: 0.5rem; }
+    button:hover { background-color: #005a00; }
+    button .material-icons { font-size: 21px; }
+    .back-icon { position: fixed; top: 1rem; left: 1rem; font-size: 24px; color: green; cursor: pointer; z-index: 1000; transition: color 0.2s; }
+    .back-icon:hover { color: #005a00; }
+    .preview { border: 1px solid #e0e0e0; padding: 1rem; background-color: #f9f9f9; border-radius: 4px; white-space: pre-wrap; font-size: 1rem; line-height: 1.5; }
+    .preview-data { text-align: right; margin-top: 50px; font-size: 1rem; padding-right: 38px; }
+    .signature { margin-top: 150px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .signature div { width: 48%; text-align: center; }
+    .signature-line { border-bottom: 2px solid #000; width: 200px; margin: 0.5rem auto; max-width: 100%; }
+    .signature p { margin: 0.5rem 0 0; font-size: 0.9rem; white-space: pre-wrap; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <!-- Ícone de Voltar Minimalista -->
+  <span id="back-icon" class="back-icon material-icons" onclick="irPara('ProcEleitoral.html')" title="Voltar ao Processo Eleitoral">arrow_back</span>
+
+  <div class="container">
+    <div class="header">
+      <img id="logo-empresa" class="logo-empresa" style="display: none;" alt="Logo da Empresa">
+      <div id="logo-placeholder" class="logo-placeholder">Logo da Empresa</div>
+      <div class="header-text">
+        <div class="titulo">Edital de Divulgação de Inscritos</div>
+        <div class="gestao" id="gestaoText">CIPA Gestão [Ano] / [Ano + 1]</div>
+      </div>
+    </div>
+
+    <div class="preview" id="previewText"></div>
+    <div class="preview-data" id="previewData"></div>
+
+    <div class="signature" id="signatureSection">
+      <div>
+        <div class="signature-line"></div>
+        <p id="repEmpresa">Representante da Empresa</p>
+      </div>
+      <div>
+        <div class="signature-line"></div>
+        <p id="repCipa">Presidente da CIPA em Curso</p>
+      </div>
+    </div>
+
+    <div class="form-container" id="generateButton">
+      <button onclick="gerarDocumento()"><span class="material-icons">file_download</span> Gerar Edital</button>
+    </div>
+  </div>
+
+  <script>
+    console.log("Iniciando carregamento de Pagina5.html...");
+    if (typeof docx === 'undefined') {
+      console.warn("Biblioteca docx.js não carregada inicialmente.");
+    } else {
+      console.log("Biblioteca docx.js carregada com sucesso.");
+    }
+
+    function irPara(pagina) {
+      console.log("Redirecionando para:", pagina);
+      window.location.href = pagina;
+    }
+
+    function getDataPosse() {
+      try {
+        const dataPosse = localStorage.getItem('dataPosse');
+        console.log("Data de posse carregada:", dataPosse);
+        return dataPosse;
+      } catch (e) {
+        console.error("Erro ao carregar data de posse:", e);
+        return null;
+      }
+    }
+
+    function calcularDataDivulgacao() {
+      const dataPosse = getDataPosse();
+      if (!dataPosse) {
+        return null;
+      }
+
+      const dataBase = new Date(dataPosse);
+      dataBase.setFullYear(dataBase.getFullYear() + 1);
+
+      let dataDivulgacao = new Date(dataBase);
+      dataDivulgacao.setDate(dataDivulgacao.getDate() - 34); // Dias antes para "DIVULGAÇÃO DOS INSCRITOS" (linha da tabela)
+      while (dataDivulgacao.getDay() === 0 || dataDivulgacao.getDay() === 6) {
+        dataDivulgacao.setDate(dataDivulgacao.getDate() - 1);
+      }
+
+      return dataDivulgacao.toISOString().split('T')[0];
+    }
+
+    function formatarDataLonga(data) {
+      const meses = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      ];
+      const dia = data.getDate().toString().padStart(2, '0');
+      const mes = meses[data.getMonth()];
+      const ano = data.getFullYear();
+      return `${dia} de ${mes} de ${ano}`;
+    }
+
+    function loadEmpresaData() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa_basica')) || {};
+        console.log("Dados da empresa carregados de 'empresa_basica':", empresaData);
+        return {
+          nome: empresaData.nome || '',
+          cnpj: empresaData.cnpj || '',
+          cnae: empresaData.cnae || '',
+          endereco: empresaData.endereco || '',
+          logo: empresaData.logo || ''
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados da empresa:", e);
+        return {
+          nome: '',
+          cnpj: '',
+          cnae: '',
+          endereco: '',
+          logo: ''
+        };
+      }
+    }
+
+    function loadAssinaturaData() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa')) || {};
+        console.log("Dados de assinatura carregados de 'empresa':", empresaData);
+        return {
+          repEmpresa: empresaData.repEmpresa || 'Não informado',
+          repCipa: empresaData.repCipa || 'Não informado'
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados de assinatura:", e);
+        return {
+          repEmpresa: 'Não informado',
+          repCipa: 'Não informado'
+        };
+      }
+    }
+
+    function loadCandidatosInscritos() {
+      try {
+        const candidatos = JSON.parse(localStorage.getItem('candidatosInscritos')) || [];
+        console.log("Candidatos inscritos carregados:", candidatos);
+        return candidatos;
+      } catch (e) {
+        console.error("Erro ao carregar candidatos inscritos:", e);
+        return [];
+      }
+    }
+
+    function atualizarTextos() {
+      const dataDivulgacao = calcularDataDivulgacao();
+      const empresaData = loadEmpresaData();
+      const assinaturaData = loadAssinaturaData();
+      const candidatosInscritos = loadCandidatosInscritos();
+      console.log("Dados recebidos:", { dataDivulgacao, empresaData, assinaturaData, candidatosInscritos });
+
+      if (!dataDivulgacao) {
+        document.getElementById('previewText').textContent = "Erro: Data de posse não encontrada. Volte à página ProcEleitoral.html e configure a data de posse.";
+        document.getElementById('previewData').textContent = "";
+        document.getElementById('generateButton').style.display = 'none';
+        console.error("Erro: Data de posse não encontrada.");
+        return;
+      }
+
+      const data = new Date(dataDivulgacao);
+      if (isNaN(data.getTime())) {
+        document.getElementById('previewText').textContent = "Erro: Data de divulgação inválida.";
+        document.getElementById('previewData').textContent = "";
+        document.getElementById('generateButton').style.display = 'none';
+        console.error("Erro: Data inválida:", { dataDivulgacao });
+        return;
+      }
+
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        document.getElementById('previewText').textContent = `Erro: Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`;
+        document.getElementById('previewData').textContent = "";
+        document.getElementById('generateButton').style.display = 'none';
+        console.error("Erro: Dados da empresa incompletos:", missingFields);
+        return;
+      }
+
+      if (candidatosInscritos.length === 0) {
+        document.getElementById('previewText').textContent = "Erro: Nenhum candidato inscrito. Por favor, insira candidatos na etapa anterior.";
+        document.getElementById('previewData').textContent = "";
+        document.getElementById('generateButton').style.display = 'none';
+        console.error("Erro: Nenhum candidato inscrito.");
+        return;
+      }
+
+      const logoImg = document.getElementById('logo-empresa');
+      const logoPlaceholder = document.getElementById('logo-placeholder');
+      if (empresaData.logo) {
+        logoImg.src = empresaData.logo;
+        logoImg.style.display = 'block';
+        logoPlaceholder.style.display = 'none';
+        console.log("Logotipo carregado com sucesso.");
+      } else {
+        logoImg.style.display = 'none';
+        logoPlaceholder.style.display = 'flex';
+        console.log("Nenhum logotipo encontrado, exibindo placeholder.");
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      document.getElementById('gestaoText').textContent = `CIPA Gestão ${anoInicio} / ${anoFim}`;
+
+      const dataLongaFormatada = formatarDataLonga(data);
+
+      const candidatosTexto = candidatosInscritos.map(c => c.nome).join('\n');
+
+      const texto = `A ${empresaData.nome}, em cumprimento ao item 5.5.3, alínea "e" da Norma Regulamentadora nº 5 (NR-5), torna público a relação dos candidatos inscritos para a eleição da Comissão Interna de Prevenção de Acidentes e de Assédio (CIPA).\n\n` +
+        `Candidatos inscritos:\n\n${candidatosTexto}`;
+
+      document.getElementById('previewText').textContent = texto;
+      document.getElementById('previewData').textContent = dataLongaFormatada;
+      document.getElementById('repEmpresa').textContent = `${assinaturaData.repEmpresa}\nRepresentante da Empresa`;
+      document.getElementById('repCipa').textContent = `${assinaturaData.repCipa}\nPresidente da CIPA em Curso`;
+      document.getElementById('generateButton').style.display = 'flex';
+      console.log("Texto, data, assinaturas e logotipo atualizados com sucesso.");
+    }
+
+    window.onload = () => {
+      console.log("Carregando Pagina5.html...");
+      atualizarTextos();
+    };
+
+    function gerarDocumento() {
+      console.log("Iniciando geração do edital Word...");
+      if (typeof docx === 'undefined') {
+        console.error("Erro: Biblioteca docx.js não carregada.");
+        alert("Erro: Não foi possível carregar a biblioteca para gerar o edital. Verifique sua conexão à internet, tente outro navegador ou contate o suporte.");
+        return;
+      }
+
+      const dataDivulgacao = calcularDataDivulgacao();
+      const empresaData = loadEmpresaData();
+      const assinaturaData = loadAssinaturaData();
+      const candidatosInscritos = loadCandidatosInscritos();
+
+      if (!dataDivulgacao) {
+        console.error("Erro ao gerar edital: Data de posse não encontrada.");
+        alert("Data de posse não encontrada. Volte à página ProcEleitoral.html e configure a data de posse.");
+        return;
+      }
+
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        console.error("Erro ao gerar edital: Dados da empresa incompletos:", missingFields);
+        alert(`Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`);
+        return;
+      }
+
+      if (candidatosInscritos.length === 0) {
+        console.error("Erro ao gerar edital: Nenhum candidato inscrito.");
+        alert("Nenhum candidato inscrito. Por favor, insira candidatos na etapa anterior.");
+        return;
+      }
+
+      const data = new Date(dataDivulgacao);
+      if (isNaN(data.getTime())) {
+        console.error("Erro ao gerar edital: Data de divulgação inválida:", { dataDivulgacao });
+        alert("A data de divulgação fornecida é inválida.");
+        return;
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      const dataLongaFormatada = formatarDataLonga(data);
+
+      try {
+        function base64ToArrayBuffer(base64) {
+          if (!base64 || !base64.includes(',')) {
+            throw new Error("Formato de imagem inválido ou vazio.");
+          }
+          const binaryString = window.atob(base64.split(',')[1]);
+          const len = binaryString.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          return bytes.buffer;
+        }
+
+        const invisibleBorders = {
+          top: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          bottom: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          left: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          right: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" }
+        };
+
+        const headerChildren = [
+          new docx.Table({
+            rows: [
+              new docx.TableRow({
+                children: [
+                  new docx.TableCell({
+                    width: { size: 1000, type: docx.WidthType.DXA },
+                    children: empresaData.logo ? [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.ImageRun({
+                            data: base64ToArrayBuffer(empresaData.logo),
+                            transformation: { width: 50, height: 50 }
+                          })
+                        ],
+                        alignment: docx.AlignmentType.LEFT
+                      })
+                    ] : [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: "Logo da Empresa",
+                            size: 12,
+                            font: "Arial",
+                            color: "555555"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.LEFT
+                      })
+                    ],
+                    borders: invisibleBorders
+                  }),
+                  new docx.TableCell({
+                    width: { size: 8000, type: docx.WidthType.DXA },
+                    children: [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: "Edital de Divulgação de Inscritos",
+                            bold: true,
+                            size: 36,
+                            font: "Arial",
+                            color: "008000"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.CENTER
+                      }),
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: `CIPA Gestão ${anoInicio} / ${anoFim}`,
+                            size: 20,
+                            font: "Arial",
+                            color: "555555"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.CENTER,
+                        spacing: { after: 200 }
+                      })
+                    ],
+                    borders: invisibleBorders
+                  })
+                ]
+              })
+            ],
+            width: { size: 100, type: docx.WidthType.PERCENTAGE }
+          })
+        ];
+
+        const candidatosParagrafos = candidatosInscritos.map(candidato => 
+          new docx.Paragraph({
+            children: [
+              new docx.TextRun({
+                text: candidato.nome,
+                size: 24,
+                font: "Arial"
+              })
+            ],
+            spacing: { after: 100 }
+          })
+        );
+
+        const doc = new docx.Document({
+          sections: [{
+            headers: {
+              default: new docx.Header({
+                children: headerChildren
+              })
+            },
+            properties: {},
+            children: [
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `A ${empresaData.nome}, em cumprimento ao item 5.5.3, alínea "e" da Norma Regulamentadora nº 5 (NR-5), torna público a relação dos candidatos inscritos para a eleição da Comissão Interna de Prevenção de Acidentes e de Assédio (CIPA).`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { before: 720, after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: "Candidatos inscritos:",
+                    bold: true,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 100 }
+              }),
+              new docx.Paragraph({
+                children: [],
+                spacing: { after: 100 }
+              }), // Linha em branco
+              ...candidatosParagrafos,
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: dataLongaFormatada,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                alignment: docx.AlignmentType.RIGHT,
+                indent: { right: 567 },
+                spacing: { before: 1440, after: 720 }
+              }),
+              new docx.Table({
+                rows: [
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 50, type: docx.WidthType.PERCENTAGE },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "_________________________",
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { before: 720, after: 100 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: assinaturaData.repEmpresa,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 50 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Representante da Empresa",
+                                size: 20,
+                                font: "Arial",
+                                italics: true
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 720 }
+                          })
+                        ],
+                        borders: invisibleBorders,
+                        verticalAlign: docx.VerticalAlign.TOP
+                      }),
+                      new docx.TableCell({
+                        width: { size: 50, type: docx.WidthType.PERCENTAGE },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "_________________________",
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { before: 720, after: 100 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: assinaturaData.repCipa,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 50 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Presidente da CIPA em Curso",
+                                size: 20,
+                                font: "Arial",
+                                italics: true
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 720 }
+                          })
+                        ],
+                        borders: invisibleBorders,
+                        verticalAlign: docx.VerticalAlign.TOP
+                      })
+                    ]
+                  })
+                ],
+                width: { size: 100, type: docx.WidthType.PERCENTAGE }
+              })
+            ]
+          }]
+        });
+
+        docx.Packer.toBlob(doc).then(blob => {
+          console.log("Edital Word gerado com sucesso.");
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "Edital_Divulgacao_Inscritos.docx";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }).catch(error => {
+          console.error("Erro ao gerar o edital Word:", error);
+          alert("Erro ao gerar o edital. Verifique o console para detalhes.");
+        });
+      } catch (error) {
+        console.error("Erro ao criar o edital:", error);
+        alert("Erro ao criar o edital. Verifique o console para detalhes.");
+      }
+    }
+  </script>
+</body>
+</html>

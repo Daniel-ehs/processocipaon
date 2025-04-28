@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Passo 4 - Inscrição de Candidatos</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 4rem;
+    }
+
+    .form-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #E6F4E6;
+      padding: 1rem;
+      position: relative;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+
+    .logo-cipa {
+      position: absolute;
+      left: 1rem;
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+    }
+
+    .header-text {
+      text-align: center;
+      color: #000;
+    }
+
+    .titulo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    .gestao {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .form-body {
+      padding: 1rem;
+      background-color: #FFFFFF;
+      border: 1px solid #ccc;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    .form-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+
+    .form-table tr {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.3rem;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .form-table td.label {
+      width: 120px;
+      font-weight: bold;
+      font-size: 1rem;
+      text-align: left;
+      padding-left: 0.5rem;
+    }
+
+    .form-table td.value {
+      flex: 1;
+      font-size: 1rem;
+    }
+
+    .form-table .data-hora {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .form-table .data-hora td.label {
+      width: 120px;
+      text-align: left;
+      padding-left: 0.5rem;
+    }
+
+    .form-table .data-hora td.value {
+      flex: 1;
+    }
+
+    .form-table input.field {
+      display: inline-block;
+      background-color: #f5f5f5;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 0.4rem 0.6rem;
+      width: 600px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-table input.field[readonly] {
+      cursor: not-allowed;
+      color: #333;
+    }
+
+    .signature-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 3rem;
+      padding: 0 1rem;
+    }
+
+    .signature-section div {
+      text-align: center;
+      width: 45%;
+    }
+
+    .signature-line {
+      border-bottom: 2px solid #000;
+      margin: 0 auto 0.5rem auto;
+      display: inline-block;
+      visibility: visible;
+      min-width: 100px;
+    }
+
+    .signature-section p {
+      margin: 0;
+      font-size: 0.9rem;
+      word-wrap: break-word;
+    }
+
+    .via-text {
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      margin-left: 1rem;
+    }
+
+    .form-container {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: nowrap;
+    }
+
+    button {
+      padding: 0.65rem 1.3rem;
+      font-size: 1.06rem;
+      background-color: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background-color: #005a00;
+    }
+
+    button .material-icons {
+      font-size: 21px;
+    }
+
+    .back-icon {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      font-size: 24px;
+      color: green;
+      cursor: pointer;
+      z-index: 1000;
+      transition: color 0.2s;
+    }
+
+    .back-icon:hover {
+      color: #005a00;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2000;
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      position: relative;
+      background-color: white;
+      width: 320px;
+      margin: 10% auto;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .modal-content h3 {
+      margin: 0 0 1rem;
+      font-size: 1.3rem;
+      color: #333;
+    }
+
+    .modal-content label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+      font-size: 0.95rem;
+      color: #333;
+      font-weight: 500;
+      text-align: left;
+    }
+
+    .modal-content select {
+      padding: 0.5rem;
+      font-size: 0.95rem;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+
+    .modal-content select:focus {
+      outline: none;
+      border-color: #28a745;
+    }
+
+    .modal-content select.error {
+      border-color: #dc3545;
+    }
+
+    .modal-content button {
+      margin-top: 1rem;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-content button:hover {
+      filter: brightness(90%);
+    }
+
+    .modal-content button.confirm {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .modal-content button.cancel {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+      display: none;
+      text-align: left;
+    }
+
+    .error-message.active {
+      display: block;
+    }
+
+    .via-divider {
+      border-top: 2px dashed #ccc;
+      margin: 2rem 0;
+    }
+
+    #candidatosModal .modal-content {
+      width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    #candidatosModal table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+
+    #candidatosModal th, #candidatosModal td {
+      border: 1px solid #ccc;
+      padding: 0.8rem;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    #candidatosModal th {
+      background-color: #E6F4E6;
+      font-weight: bold;
+    }
+
+    #candidatosModal tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    #candidatosModal tr.clickable:hover {
+      background-color: #e0e0e0;
+      cursor: pointer;
+    }
+
+    #candidatosModal .no-data {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #666;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <span id="back-icon" class="back-icon material-icons" onclick="irPara('ProcEleitoral.html')" title="Voltar ao Processo Eleitoral">arrow_back</span>
+
+  <div class="modal" id="inputModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Informe os Detalhes da Inscrição</h3>
+      <label for="modalCandidato">Nome do Candidato</label>
+      <select id="modalCandidato">
+        <option value="">Selecione um candidato</option>
+      </select>
+      <div id="modalCandidatoError" class="error-message">Por favor, selecione um candidato.</div>
+      <button class="confirm" onclick="submitModal()"><span class="material-icons">check</span> Confirmar</button>
+      <button class="cancel" onclick="closeModal()"><span class="material-icons">close</span> Cancelar</button>
+    </div>
+  </div>
+
+  <div class="modal" id="candidatosModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Candidatos Inscritos</h3>
+      <table id="candidatosTable">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Apelido</th>
+            <th>Setor</th>
+            <th>Função</th>
+            <th>Data</th>
+            <th>Hora</th>
+          </tr>
+        </thead>
+        <tbody id="candidatosBody"></tbody>
+      </table>
+      <button class="cancel" onclick="fecharCandidatosModal()"><span class="material-icons">close</span> Fechar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="form-header">
+      <img class="logo-cipa" src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" alt="Logo da CIPA">
+      <div class="header-text">
+        <div class="titulo">FICHA DE INSCRIÇÃO DE CANDIDATOS</div>
+        <div class="gestao" id="gestaoText1">CIPA Gestão [Ano] / [Ano + 1]</div>
+      </div>
+    </div>
+    <div class="form-body" id="formBody1" style="display: none;">
+      <table class="form-table">
+        <tr>
+          <td class="label">Candidato:</td>
+          <td class="value"><input type="text" class="field" id="nomeCandidato1" readonly></td>
+        </tr>
+        <tr>
+          <td class="label">Apelido:</td>
+          <td class="value"><input type="text" class="field" id="apelido1" readonly></td>
+        </tr>
+        <tr>
+          <td class="label">Setor:</td>
+          <td class="value"><input type="text" class="field" id="setor1" readonly></td>
+        </tr>
+        <tr>
+          <td class="label">Função:</td>
+          <td class="value"><input type="text" class="field" id="funcao1" readonly></td>
+        </tr>
+        <tr class="data-hora">
+          <td class="label">Data:</td>
+          <td class="value"><input type="text" class="field" id="data1" readonly></td>
+        </tr>
+        <tr class="data-hora">
+          <td class="label">Hora:</td>
+          <td class="value"><input type="text" class="field" id="hora1" readonly></td>
+        </tr>
+      </table>
+      <div class="signature-section">
+        <div>
+          <div class="signature-line" id="signatureLine1"></div>
+          <p id="presidenteCipa1"></p>
+          <p>Presidente da CIPA em curso</p>
+        </div>
+        <div>
+          <div class="signature-line" id="signatureLine2"></div>
+          <p id="candidato1"></p>
+          <p>Candidato</p>
+        </div>
+      </div>
+      <div class="via-text">1ª Via - Candidato</div>
+    </div>
+
+    <div class="via-divider" id="viaDivider" style="display: none;"></div>
+
+    <div class="form-header" id="formHeader2" style="display: none;">
+      <img class="logo-cipa" src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" alt="Logo da CIPA">
+      <div class="header-text">
+        <div class="titulo">FICHA DE INSCRIÇÃO DE CANDIDATOS</div>
+        <div class="gestao" id="gestaoText2">CIPA Gestão [Ano] / [Ano + 1]</div>
+      </div>
+    </div>
+    <div class="form-body" id="formBody2" style="display: none;">
+      <table class="form-table">
+        <tr>
+          <td class="label">Candidato:</td>
+          <td class="value"><input type="text" class="field" id="nomeCandidato2" readonly></td>
+        </tr>
+        <tr>
+          <td class="label">Apelido:</td>
+          <td class="value"><input type="text" class="field" id="apelido2" readonly></td>
+        </tr>
+        <tr>
+          <td class="label">Setor:</td>
+          <td class="value"><input type="text" class="field" id="setor2" readonly></td>
+        </tr>
+        <tr>
+          <td class="label">Função:</td>
+          <td class="value"><input type="text" class="field" id="funcao2" readonly></td>
+        </tr>
+        <tr class="data-hora">
+          <td class="label">Data:</td>
+          <td class="value"><input type="text" class="field" id="data2" readonly></td>
+        </tr>
+        <tr class="data-hora">
+          <td class="label">Hora:</td>
+          <td class="value"><input type="text" class="field" id="hora2" readonly></td>
+        </tr>
+      </table>
+      <div class="signature-section">
+        <div>
+          <div class="signature-line" id="signatureLine3"></div>
+          <p id="presidenteCipa2"></p>
+          <p>Presidente da CIPA em curso</p>
+        </div>
+        <div>
+          <div class="signature-line" id="signatureLine4"></div>
+          <p id="candidato2"></p>
+          <p>Candidato</p>
+        </div>
+      </div>
+      <div class="via-text">2ª Via - Empresa</div>
+    </div>
+
+    <div class="form-container" id="generateButton" style="display: none;">
+      <button onclick="gerarDocumento()"><span class="material-icons">file_download</span> Ficha de Inscrição</button>
+      <button onclick="confirmarCandidatura()"><span class="material-icons">check_circle</span> Confirmar Candidatura</button>
+      <button onclick="verCandidatos()"><span class="material-icons">visibility</span> Candidatos</button>
+      <button onclick="inserirNovoCandidato()"><span class="material-icons">person_add</span> Novo Candidato</button>
+    </div>
+  </div>
+
+  <script>
+    console.log("Iniciando carregamento de Pagina4.html...");
+
+    let formData = { nome: '', apelido: '', setor: '', funcao: '', data: '', hora: '' };
+    let candidatosInscritos = JSON.parse(localStorage.getItem('candidatosInscritos')) || [];
+
+    function irPara(pagina) {
+      console.log("Redirecionando para:", pagina);
+      window.location.href = pagina;
+    }
+
+    function getDataFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      console.log("Parâmetros da URL:", params.toString());
+      return {
+        data: params.get('data')
+      };
+    }
+
+    function getDataPosse() {
+      try {
+        const dataPosse = localStorage.getItem('dataPosse');
+        console.log("Data de posse carregada:", dataPosse);
+        return dataPosse;
+      } catch (e) {
+        console.error("Erro ao carregar data de posse:", e);
+        return null;
+      }
+    }
+
+    function calcularDatas(dataPosse) {
+      if (!dataPosse) {
+        return { dataInscricao: null };
+      }
+
+      const dataBase = new Date(dataPosse);
+      dataBase.setFullYear(dataBase.getFullYear() + 1);
+
+      let dataInscricao = new Date(dataBase);
+      dataInscricao.setDate(dataInscricao.getDate() - 45);
+      while (dataInscricao.getDay() === 0 || dataInscricao.getDay() === 6) {
+        dataInscricao.setDate(dataInscricao.getDate() - 1);
+      }
+
+      return {
+        dataInscricao: dataInscricao.toISOString().split('T')[0]
+      };
+    }
+
+    function formatarData(data) {
+      const dia = data.getDate().toString().padStart(2, '0');
+      const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+      const ano = data.getFullYear();
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    function loadEmpresaData() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa_basica')) || {};
+        console.log("Dados da empresa carregados de 'empresa_basica':", empresaData);
+        return {
+          nome: empresaData.nome || '',
+          cnpj: empresaData.cnpj || '',
+          cnae: empresaData.cnae || '',
+          endereco: empresaData.endereco || '',
+          logo: empresaData.logo || ''
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados da empresa:", e);
+        return {
+          nome: '',
+          cnpj: '',
+          cnae: '',
+          endereco: '',
+          logo: ''
+        };
+      }
+    }
+
+    function loadAssinaturaData() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa')) || {};
+        console.log("Dados de assinatura carregados de 'empresa':", empresaData);
+        return {
+          repEmpresa: empresaData.repEmpresa || 'Não informado',
+          repCipa: empresaData.repCipa || 'Não informado'
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados de assinatura:", e);
+        return {
+          repEmpresa: 'Não informado',
+          repCipa: 'Não informado'
+        };
+      }
+    }
+
+    function loadColaboradores() {
+      try {
+        const colaboradores = JSON.parse(localStorage.getItem('colaboradores')) || [];
+        console.log("Colaboradores carregados:", colaboradores);
+        return colaboradores;
+      } catch (e) {
+        console.error("Erro ao carregar colaboradores:", e);
+        return [];
+      }
+    }
+
+    function popularListaCandidatos() {
+      const select = document.getElementById('modalCandidato');
+      const colaboradores = loadColaboradores();
+      select.innerHTML = '<option value="">Selecione um candidato</option>';
+      colaboradores.forEach(col => {
+        const option = document.createElement('option');
+        option.value = col.nome;
+        option.textContent = col.nome;
+        select.appendChild(option);
+      });
+    }
+
+    function showModal() {
+      document.getElementById('inputModal').style.display = 'block';
+      popularListaCandidatos();
+    }
+
+    function closeModal() {
+      document.getElementById('inputModal').style.display = 'none';
+      if (formData.nome) {
+        atualizarFormularios();
+        document.getElementById('formBody1').style.display = 'block';
+        document.getElementById('formHeader2').style.display = 'block';
+        document.getElementById('formBody2').style.display = 'block';
+        document.getElementById('viaDivider').style.display = 'block';
+        document.getElementById('generateButton').style.display = 'block';
+      }
+    }
+
+    function submitModal() {
+      const candidato = document.getElementById('modalCandidato').value.trim();
+      const candidatoError = document.getElementById('modalCandidatoError');
+      let isValid = true;
+
+      if (!candidato) {
+        candidatoError.classList.add('active');
+        document.getElementById('modalCandidato').classList.add('error');
+        isValid = false;
+      } else {
+        candidatoError.classList.remove('active');
+        document.getElementById('modalCandidato').classList.remove('error');
+      }
+
+      if (isValid) {
+        const colaboradores = loadColaboradores();
+        const colaborador = colaboradores.find(col => col.nome === candidato);
+        if (!colaborador) {
+          alert("Erro: Candidato não encontrado.");
+          return;
+        }
+
+        formData = {
+          nome: colaborador.nome,
+          apelido: colaborador.apelido || '',
+          setor: colaborador.setor,
+          funcao: colaborador.funcao,
+          data: '',
+          hora: ''
+        };
+
+        document.getElementById('inputModal').style.display = 'none';
+        atualizarFormularios();
+        document.getElementById('formBody1').style.display = 'block';
+        document.getElementById('formHeader2').style.display = 'block';
+        document.getElementById('formBody2').style.display = 'block';
+        document.getElementById('viaDivider').style.display = 'block';
+        document.getElementById('generateButton').style.display = 'block';
+      }
+    }
+
+    function atualizarFormularios() {
+      const { data: dataUrl } = getDataFromUrl();
+      const dataPosse = getDataPosse();
+      const { dataInscricao } = calcularDatas(dataPosse);
+      const empresaData = loadEmpresaData();
+      const assinaturaData = loadAssinaturaData();
+      console.log("Dados recebidos:", { dataUrl, dataPosse, dataInscricao, empresaData, assinaturaData, formData });
+
+      if (!dataPosse || !dataInscricao) {
+        alert("Erro: Dados incompletos (falta data de posse ou data de inscrição). Volte ao calendário e insira uma data de posse válida.");
+        console.error("Erro: Dados incompletos:", { dataPosse, dataInscricao });
+        return;
+      }
+
+      const data = new Date(dataInscricao);
+      if (isNaN(data.getTime())) {
+        alert("Erro: Data de inscrição inválida.");
+        console.error("Erro: Data inválida:", { dataInscricao });
+        return;
+      }
+
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        alert(`Erro: Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`);
+        console.error("Erro: Dados da empresa incompletos:", missingFields);
+        return;
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      formData.data = formData.data || formatarData(data);
+      formData.hora = formData.hora || new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+      document.getElementById('gestaoText1').textContent = `CIPA Gestão ${anoInicio} / ${anoFim}`;
+      document.getElementById('nomeCandidato1').value = formData.nome;
+      document.getElementById('apelido1').value = formData.apelido || 'Não informado';
+      document.getElementById('setor1').value = formData.setor;
+      document.getElementById('funcao1').value = formData.funcao;
+      document.getElementById('data1').value = formData.data;
+      document.getElementById('hora1').value = formData.hora;
+      document.getElementById('presidenteCipa1').textContent = assinaturaData.repCipa;
+      document.getElementById('candidato1').textContent = formData.nome;
+
+      document.getElementById('gestaoText2').textContent = `CIPA Gestão ${anoInicio} / ${anoFim}`;
+      document.getElementById('nomeCandidato2').value = formData.nome;
+      document.getElementById('apelido2').value = formData.apelido || 'Não informado';
+      document.getElementById('setor2').value = formData.setor;
+      document.getElementById('funcao2').value = formData.funcao;
+      document.getElementById('data2').value = formData.data;
+      document.getElementById('hora2').value = formData.hora;
+      document.getElementById('presidenteCipa2').textContent = assinaturaData.repCipa;
+      document.getElementById('candidato2').textContent = formData.nome;
+
+      setTimeout(adjustSignatureLines, 0);
+      console.log("Formulários atualizados com sucesso.");
+    }
+
+    function adjustSignatureLines() {
+      const presidenteCipa1 = document.getElementById('presidenteCipa1');
+      const candidato1 = document.getElementById('candidato1');
+      const presidenteCipa2 = document.getElementById('presidenteCipa2');
+      const candidato2 = document.getElementById('candidato2');
+
+      const signatureLine1 = document.getElementById('signatureLine1');
+      const signatureLine2 = document.getElementById('signatureLine2');
+      const signatureLine3 = document.getElementById('signatureLine3');
+      const signatureLine4 = document.getElementById('signatureLine4');
+
+      const width1 = presidenteCipa1.offsetWidth || 100;
+      const width2 = candidato1.offsetWidth || 100;
+      signatureLine1.style.width = `${width1}px`;
+      signatureLine2.style.width = `${width2}px`;
+      signatureLine3.style.width = `${width1}px`;
+      signatureLine4.style.width = `${width2}px`;
+    }
+
+    function resetarFormulario() {
+      document.getElementById('nomeCandidato1').value = '';
+      document.getElementById('apelido1').value = '';
+      document.getElementById('setor1').value = '';
+      document.getElementById('funcao1').value = '';
+      document.getElementById('data1').value = '';
+      document.getElementById('hora1').value = '';
+      document.getElementById('presidenteCipa1').textContent = '';
+      document.getElementById('candidato1').textContent = '';
+
+      document.getElementById('nomeCandidato2').value = '';
+      document.getElementById('apelido2').value = '';
+      document.getElementById('setor2').value = '';
+      document.getElementById('funcao2').value = '';
+      document.getElementById('data2').value = '';
+      document.getElementById('hora2').value = '';
+      document.getElementById('presidenteCipa2').textContent = '';
+      document.getElementById('candidato2').textContent = '';
+
+      document.getElementById('formBody1').style.display = 'none';
+      document.getElementById('formHeader2').style.display = 'none';
+      document.getElementById('formBody2').style.display = 'none';
+      document.getElementById('viaDivider').style.display = 'none';
+      document.getElementById('generateButton').style.display = 'none';
+
+      showModal();
+    }
+
+    function inserirNovoCandidato() {
+      console.log("Inserindo novo candidato...");
+      resetarFormulario();
+    }
+
+    function confirmarCandidatura() {
+      console.log("Confirmando candidatura...");
+
+      formData.nome = document.getElementById('nomeCandidato1').value.trim();
+      formData.apelido = document.getElementById('apelido1').value.trim();
+      formData.setor = document.getElementById('setor1').value.trim();
+      formData.funcao = document.getElementById('funcao1').value.trim();
+      formData.data = document.getElementById('data1').value.trim();
+      formData.hora = document.getElementById('hora1').value.trim();
+
+      if (!formData.nome || !formData.setor || !formData.funcao || !formData.data || !formData.hora) {
+        console.error("Erro ao confirmar candidatura: Dados incompletos.");
+        alert("Por favor, preencha todos os campos obrigatórios antes de confirmar a candidatura.");
+        return;
+      }
+
+      if (candidatosInscritos.some(c => c.nome === formData.nome)) {
+        console.warn("Candidato já inscrito:", formData.nome);
+        alert("Este candidato já está inscrito.");
+        resetarFormulario();
+        return;
+      }
+
+      candidatosInscritos.push({ ...formData });
+      localStorage.setItem('candidatosInscritos', JSON.stringify(candidatosInscritos));
+      console.log("Candidatura confirmada:", formData);
+      alert("Candidatura confirmada com sucesso!");
+      resetarFormulario();
+    }
+
+    function verCandidatos() {
+      console.log("Exibindo candidatos inscritos...");
+      const tbody = document.getElementById('candidatosBody');
+      tbody.innerHTML = '';
+
+      if (candidatosInscritos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="no-data">Nenhum candidato inscrito.</td></tr>';
+      } else {
+        candidatosInscritos.forEach((candidato, index) => {
+          const row = document.createElement('tr');
+          row.classList.add('clickable');
+          row.setAttribute('data-index', index);
+          row.innerHTML = `
+            <td>${candidato.nome}</td>
+            <td>${candidato.apelido || 'Não informado'}</td>
+            <td>${candidato.setor}</td>
+            <td>${candidato.funcao}</td>
+            <td>${candidato.data}</td>
+            <td>${candidato.hora}</td>
+          `;
+          row.addEventListener('click', () => carregarCandidato(index));
+          tbody.appendChild(row);
+        });
+      }
+
+      document.getElementById('candidatosModal').style.display = 'block';
+    }
+
+    function carregarCandidato(index) {
+      console.log("Carregando candidato:", index);
+      const candidato = candidatosInscritos[index];
+      if (!candidato) {
+        console.error("Candidato não encontrado no índice:", index);
+        return;
+      }
+
+      formData = { ...candidato };
+      fecharCandidatosModal();
+      atualizarFormularios();
+      document.getElementById('formBody1').style.display = 'block';
+      document.getElementById('formHeader2').style.display = 'block';
+      document.getElementById('formBody2').style.display = 'block';
+      document.getElementById('viaDivider').style.display = 'block';
+      document.getElementById('generateButton').style.display = 'block';
+    }
+
+    function fecharCandidatosModal() {
+      document.getElementById('candidatosModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+      console.log("Carregando Pagina4.html...");
+      showModal();
+    };
+
+    function gerarDocumento() {
+      console.log("Iniciando geração do PDF da ficha de inscrição...");
+
+      const empresaData = loadEmpresaData();
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        console.error("Erro ao gerar PDF: Dados da empresa incompletos:", missingFields);
+        alert(`Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`);
+        return;
+      }
+
+      formData.nome = document.getElementById('nomeCandidato1').value.trim();
+      formData.apelido = document.getElementById('apelido1').value.trim();
+      formData.setor = document.getElementById('setor1').value.trim();
+      formData.funcao = document.getElementById('funcao1').value.trim();
+      formData.data = document.getElementById('data1').value.trim();
+      formData.hora = document.getElementById('hora1').value.trim();
+
+      if (!formData.nome || !formData.setor || !formData.funcao || !formData.data || !formData.hora) {
+        console.error("Erro ao gerar PDF: Dados da inscrição não fornecidos.");
+        alert("Por favor, selecione um candidato para continuar.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const tempContainer = document.createElement('div');
+      tempContainer.style.display = 'block';
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.width = '800px';
+
+      const via1 = document.querySelector('.container').children[0];
+      const via1Body = document.getElementById('formBody1');
+      tempContainer.appendChild(via1.cloneNode(true));
+      tempContainer.appendChild(via1Body.cloneNode(true));
+
+      const divider = document.createElement('div');
+      divider.style.borderTop = '2px dashed #ccc';
+      divider.style.margin = '1rem 0';
+      tempContainer.appendChild(divider);
+
+      const via2 = document.getElementById('formHeader2');
+      const via2Body = document.getElementById('formBody2');
+      tempContainer.appendChild(via2.cloneNode(true));
+      tempContainer.appendChild(via2Body.cloneNode(true));
+
+      document.body.appendChild(tempContainer);
+
+      html2canvas(tempContainer, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const pageHeight = 297;
+
+        if (imgHeight > pageHeight - 20) {
+          const scale = (pageHeight - 20) / imgHeight;
+          doc.addImage(imgData, 'PNG', 10, 10, imgWidth * scale, imgHeight * scale);
+        } else {
+          const marginTop = (pageHeight - imgHeight) / 2;
+          doc.addImage(imgData, 'PNG', 10, marginTop, imgWidth, imgHeight);
+        }
+
+        doc.save('Ficha_Inscricao_CIPA.pdf');
+        console.log("PDF gerado com sucesso.");
+        document.body.removeChild(tempContainer);
+      }).catch(error => {
+        console.error("Erro ao gerar o PDF:", error);
+        alert("Erro ao gerar o PDF. Verifique o console para detalhes.");
+        document.body.removeChild(tempContainer);
+      });
+    }
+  </script>
+</body>
+</html>

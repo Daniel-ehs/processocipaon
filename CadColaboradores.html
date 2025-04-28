@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Colaboradores</title>
+  <style>
+    :root {
+      --primary-green: #28a745;
+      --dark-green: #218838;
+      --text-dark: #222;
+      --text-gray: #555;
+      --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      --light-bg: #f8f8f8;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7fa;
+      margin: 0;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      width: 90%;
+      max-width: 800px;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo-cipa {
+      width: 60px;
+      height: auto;
+      margin-right: 1rem;
+    }
+
+    .titulo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-green);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .container {
+      width: 90%;
+      max-width: 800px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-dark);
+      margin-bottom: 0.4rem;
+      text-align: left;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="file"] {
+      padding: 0.6rem;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary-green);
+      margin: 2rem 0 1.5rem;
+      text-align: center;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+      margin-top: 2.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .actions .form-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .actions .btn {
+      min-width: 150px;
+    }
+
+    .colaboradores-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+
+    .colaboradores-table th,
+    .colaboradores-table td {
+      padding: 0.9rem;
+      text-align: left;
+      font-size: 0.9rem;
+      border: 1px solid #ddd;
+    }
+
+    .colaboradores-table th {
+      background-color: var(--primary-green);
+      color: white;
+      font-weight: bold;
+    }
+
+    .colaboradores-table tr:nth-child(even) {
+      background-color: var(--light-bg);
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      background: linear-gradient(to bottom, var(--primary-green), var(--dark-green));
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background: var(--dark-green);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .error {
+      color: red;
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    .counter-card {
+      background-color: var(--light-bg);
+      border: 2px solid var(--primary-green);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-dark);
+      box-shadow: var(--shadow);
+    }
+
+    .counter-card span {
+      color: var(--primary-green);
+      font-size: 1.3rem;
+    }
+
+    @media (max-width: 768px) {
+      .logo-cipa {
+        width: 50px;
+      }
+
+      .titulo {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        padding: 1.5rem;
+      }
+
+      .colaboradores-table th,
+      .colaboradores-table td {
+        font-size: 0.8rem;
+        padding: 0.6rem;
+      }
+
+      .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+      }
+
+      .actions {
+        flex-direction: column;
+        align-items: stretch;
+        margin-top: 2rem;
+      }
+
+      .actions .form-group {
+        min-width: 100%;
+      }
+
+      .actions .btn {
+        width: 100%;
+      }
+
+      .counter-card {
+        font-size: 1rem;
+      }
+
+      .counter-card span {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header-container">
+    <img src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" class="logo-cipa" alt="Logo CIPA">
+    <div class="titulo">Cadastro de Colaboradores</div>
+  </div>
+  <div class="container">
+    <form id="colaboradorForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="registro">Registro do Empregado</label>
+          <input type="text" id="registro" required>
+          <span class="error" id="registroError">O registro é obrigatório e deve ser único</span>
+        </div>
+        <div class="form-group">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" required>
+          <span class="error" id="nomeError">O nome é obrigatório</span>
+        </div>
+        <div class="form-group">
+          <label for="setor">Setor</label>
+          <input type="text" id="setor" required>
+          <span class="error" id="setorError">O setor é obrigatório</span>
+        </div>
+        <div class="form-group">
+          <label for="funcao">Função</label>
+          <input type="text" id="funcao" required>
+          <span class="error" id="funcaoError">A função é obrigatória</span>
+        </div>
+        <div class="form-group">
+          <label for="dataAdmissao">Data de Admissão</label>
+          <input type="text" id="dataAdmissao" placeholder="DD/MM/AAAA" required>
+          <span class="error" id="dataAdmissaoError">Data inválida (use DD/MM/AAAA)</span>
+        </div>
+        <div class="form-group">
+          <label for="apelido">Apelido</label>
+          <input type="text" id="apelido">
+        </div>
+      </div>
+      <button type="submit" class="btn">Cadastrar</button>
+    </form>
+    <div class="actions">
+      <div class="form-group">
+        <label for="importCsv">Selecionar CSV</label>
+        <input type="file" id="importCsv" accept=".csv">
+        <span class="error" id="importCsvError">Erro ao importar CSV</span>
+      </div>
+      <button class="btn" onclick="importarCsv()">Importar CSV</button>
+      <button class="btn" onclick="exportToExcel()">Exportar para Excel</button>
+    </div>
+    <div class="counter-card">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-green)" stroke-width="2">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+      </svg>
+      Total de Colaboradores Cadastrados: <span id="totalColaboradores">0</span>
+    </div>
+    <div class="section-title">Colaboradores Cadastrados</div>
+    <table class="colaboradores-table">
+      <thead>
+        <tr>
+          <th>Registro</th>
+          <th>Nome</th>
+          <th>Setor</th>
+          <th>Função</th>
+          <th>Data de Admissão</th>
+          <th>Apelido</th>
+        </tr>
+      </thead>
+      <tbody id="colaboradoresTableBody"></tbody>
+    </table>
+  </div>
+  <button class="btn" onclick="irPara('index.html')">Voltar</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script>
+    // Carregar colaboradores do localStorage
+    function carregarColaboradores() {
+      try {
+        const colaboradores = JSON.parse(localStorage.getItem('colaboradores')) || [];
+        const tbody = document.getElementById('colaboradoresTableBody');
+        const totalColaboradores = document.getElementById('totalColaboradores');
+        tbody.innerHTML = '';
+        colaboradores.forEach(col => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${col.registro}</td>
+            <td>${col.nome}</td>
+            <td>${col.setor}</td>
+            <td>${col.funcao}</td>
+            <td>${col.dataAdmissao}</td>
+            <td>${col.apelido || ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        totalColaboradores.textContent = colaboradores.length;
+      } catch (e) {
+        console.error('Erro ao carregar colaboradores:', e);
+        alert('Erro ao carregar os colaboradores. Verifique o console para detalhes.');
+      }
+    }
+
+    // Validar data no formato DD/MM/AAAA
+    function validarData(data) {
+      const trimmedData = data.trim();
+      const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+      if (!regex.test(trimmedData)) return false;
+
+      const [, dia, mes, ano] = trimmedData.match(regex);
+      const diaNum = parseInt(dia, 10);
+      const mesNum = parseInt(mes, 10);
+      const anoNum = parseInt(ano, 10);
+
+      if (diaNum < 1 || diaNum > 31 || mesNum < 1 || mesNum > 12 || anoNum < 1900 || anoNum > 2100) {
+        return false;
+      }
+
+      const date = new Date(anoNum, mesNum - 1, diaNum);
+      return date.getDate() === diaNum && date.getMonth() === mesNum - 1 && date.getFullYear() === anoNum;
+    }
+
+    // Verificar se o registro é único
+    function isRegistroUnico(registro) {
+      const colaboradores = JSON.parse(localStorage.getItem('colaboradores')) || [];
+      return !colaboradores.some(col => col.registro === registro);
+    }
+
+    // Aplicar máscara para data
+    function applyDateMask(input) {
+      input.addEventListener('input', () => {
+        let value = input.value.replace(/\D/g, '');
+        if (value.length > 2) value = `${value.slice(0, 2)}/${value.slice(2)}`;
+        if (value.length > 5) value = `${value.slice(0, 5)}/${value.slice(5, 9)}`;
+        input.value = value.slice(0, 10);
+      });
+    }
+
+    applyDateMask(document.getElementById('dataAdmissao'));
+
+    // Validação e cadastro do formulário
+    document.getElementById('colaboradorForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      let isValid = true;
+
+      const registro = document.getElementById('registro').value.trim();
+      const registroError = document.getElementById('registroError');
+      if (!registro || !isRegistroUnico(registro)) {
+        registroError.style.display = 'block';
+        isValid = false;
+      } else {
+        registroError.style.display = 'none';
+      }
+
+      const nome = document.getElementById('nome').value.trim();
+      const nomeError = document.getElementById('nomeError');
+      if (!nome) {
+        nomeError.style.display = 'block';
+        isValid = false;
+      } else {
+        nomeError.style.display = 'none';
+      }
+
+      const setor = document.getElementById('setor').value.trim();
+      const setorError = document.getElementById('setorError');
+      if (!setor) {
+        setorError.style.display = 'block';
+        isValid = false;
+      } else {
+        setorError.style.display = 'none';
+      }
+
+      const funcao = document.getElementById('funcao').value.trim();
+      const funcaoError = document.getElementById('funcaoError');
+      if (!funcao) {
+        funcaoError.style.display = 'block';
+        isValid = false;
+      } else {
+        funcaoError.style.display = 'none';
+      }
+
+      const dataAdmissao = document.getElementById('dataAdmissao').value;
+      const dataAdmissaoError = document.getElementById('dataAdmissaoError');
+      if (!validarData(dataAdmissao)) {
+        dataAdmissaoError.style.display = 'block';
+        isValid = false;
+      } else {
+        dataAdmissaoError.style.display = 'none';
+      }
+
+      const apelido = document.getElementById('apelido').value.trim();
+
+      if (isValid) {
+        const colaboradores = JSON.parse(localStorage.getItem('colaboradores')) || [];
+        colaboradores.push({ registro, nome, setor, funcao, dataAdmissao, apelido });
+        localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
+        document.getElementById('colaboradorForm').reset();
+        carregarColaboradores();
+        alert('Colaborador cadastrado com sucesso!');
+      } else {
+        alert('Por favor, corrija os erros no formulário.');
+      }
+    });
+
+    // Importar CSV
+    function importarCsv() {
+      const input = document.getElementById('importCsv');
+      const file = input.files[0];
+      const importCsvError = document.getElementById('importCsvError');
+
+      if (!file || !file.name.endsWith('.csv')) {
+        importCsvError.textContent = 'Selecione um arquivo CSV válido';
+        importCsvError.style.display = 'block';
+        return;
+      }
+
+      Papa.parse(file, {
+        header: true,
+        delimiter: ';',
+        skipEmptyLines: true,
+        complete: function(results) {
+          const colaboradores = JSON.parse(localStorage.getItem('colaboradores')) || [];
+          let erros = [];
+          let importados = 0;
+
+          results.data.forEach((row, index) => {
+            const registro = row['Registro']?.trim();
+            const nome = row['Nome']?.trim();
+            const setor = row['Setor']?.trim();
+            const funcao = row['Função']?.trim();
+            const dataAdmissao = row['Data de Admissão']?.trim();
+            const apelido = row['Apelido']?.trim() || '';
+
+            // Validar registro
+            if (!registro) {
+              erros.push(`Linha ${index + 2}: Registro está vazio`);
+              return;
+            }
+
+            // Ignorar registros duplicados
+            if (!isRegistroUnico(registro)) {
+              console.log(`Linha ${index + 2}: Registro duplicado (${registro}) ignorado`);
+              return;
+            }
+
+            // Validar outros campos
+            if (!nome) {
+              erros.push(`Linha ${index + 2}: Nome é obrigatório`);
+              return;
+            }
+            if (!setor) {
+              erros.push(`Linha ${index + 2}: Setor é obrigatório`);
+              return;
+            }
+            if (!funcao) {
+              erros.push(`Linha ${index + 2}: Função é obrigatória`);
+              return;
+            }
+            if (!validarData(dataAdmissao)) {
+              erros.push(`Linha ${index + 2}: Data de admissão inválida (use DD/MM/AAAA)`);
+              return;
+            }
+
+            // Adicionar colaborador válido
+            colaboradores.push({ registro, nome, setor, funcao, dataAdmissao, apelido });
+            importados++;
+          });
+
+          if (importados > 0) {
+            localStorage.setItem('colaboradores', JSON.stringify(colaboradores));
+            carregarColaboradores();
+            let mensagem = `Colaboradores importados com sucesso! (${importados} importados)`;
+            if (erros.length > 0) {
+              mensagem += `\nErros encontrados:\n${erros.join('\n')}`;
+              importCsvError.textContent = mensagem;
+              importCsvError.style.display = 'block';
+            } else {
+              importCsvError.style.display = 'none';
+              alert(mensagem);
+            }
+            input.value = ''; // Resetar o input
+          } else {
+            importCsvError.textContent = erros.length > 0 
+              ? `Nenhum colaborador importado.\nErros encontrados:\n${erros.join('\n')}`
+              : 'Nenhum colaborador importado. Todos os registros são duplicados ou inválidos.';
+            importCsvError.style.display = 'block';
+          }
+        },
+        error: function(err) {
+          console.error('Erro ao processar CSV:', err);
+          importCsvError.textContent = 'Erro ao processar o arquivo CSV';
+          importCsvError.style.display = 'block';
+        }
+      });
+    }
+
+    // Exportar para Excel com formatação de tabela
+    function exportToExcel() {
+      try {
+        if (!window.XLSX) {
+          throw new Error('Biblioteca SheetJS não carregada. Verifique a conexão com a internet.');
+        }
+
+        const colaboradores = JSON.parse(localStorage.getItem('colaboradores')) || [];
+
+        if (colaboradores.length === 0) {
+          alert('Nenhum colaborador cadastrado para exportar.');
+          return;
+        }
+
+        // Definir cabeçalhos e dados
+        const headers = ['Registro', 'Nome', 'Setor', 'Função', 'Data de Admissão', 'Apelido'];
+        const data = [headers, ...colaboradores.map(col => [
+          col.registro,
+          col.nome,
+          col.setor,
+          col.funcao,
+          col.dataAdmissao,
+          col.apelido || ''
+        ])];
+
+        // Criar worksheet
+        const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+        // Definir faixa da tabela (A1:F{n+1}, onde n é o número de colaboradores)
+        const range = XLSX.utils.decode_range(worksheet['!ref']);
+        const tableRange = {
+          s: { c: 0, r: 0 }, // Início: A1
+          e: { c: 5, r: colaboradores.length } // Fim: F{n+1}
+        };
+
+        // Aplicar formatação
+        for (let row = range.s.r; row <= range.e.r; row++) {
+          for (let col = range.s.c; col <= range.e.c; col++) {
+            const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+            if (!worksheet[cellAddress]) continue;
+
+            // Estilo base
+            worksheet[cellAddress].s = {
+              font: { name: 'Calibri', sz: 11 },
+              alignment: { horizontal: col === 4 ? 'center' : 'left', vertical: 'center' },
+              border: {
+                top: { style: 'thin', color: { rgb: '4A7043' } },
+                bottom: { style: 'thin', color: { rgb: '4A7043' } },
+                left: { style: 'thin', color: { rgb: '4A7043' } },
+                right: { style: 'thin', color: { rgb: '4A7043' } }
+              }
+            };
+
+            // Cabeçalhos (primeira linha)
+            if (row === 0) {
+              worksheet[cellAddress].s = {
+                ...worksheet[cellAddress].s,
+                font: { name: 'Calibri', sz: 11, bold: true, color: { rgb: 'FFFFFF' } },
+                fill: { fgColor: { rgb: '28A745' } }, // Verde do --primary-green
+                alignment: { horizontal: 'center', vertical: 'center' }
+              };
+            }
+            // Linhas de dados
+            else {
+              worksheet[cellAddress].s = {
+                ...worksheet[cellAddress].s,
+                fill: row % 2 === 1 
+                  ? { fgColor: { rgb: 'FFFFFF' } } // Branco para linhas ímpares
+                  : { fgColor: { rgb: 'F5F6F5' } } // Cinza claro para linhas pares
+              };
+            }
+          }
+        }
+
+        // Definir largura das colunas
+        worksheet['!cols'] = [
+          { wch: 10 }, // Registro
+          { wch: 25 }, // Nome (aumentado para acomodar nomes longos)
+          { wch: 15 }, // Setor
+          { wch: 20 }, // Função
+          { wch: 15 }, // Data de Admissão
+          { wch: 15 }  // Apelido
+        ];
+
+        // Habilitar filtros automáticos
+        worksheet['!autofilter'] = { ref: XLSX.utils.encode_range(tableRange) };
+
+        // Criar workbook e adicionar worksheet
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Colaboradores');
+
+        // Gerar arquivo com timestamp
+        const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
+        const filename = `colaboradores_${timestamp}.xlsx`;
+
+        // Exportar arquivo
+        XLSX.writeFile(workbook, filename, { bookType: 'xlsx', type: 'binary' });
+
+      } catch (error) {
+        console.error('Erro ao exportar para Excel:', error);
+        alert('Erro ao gerar o arquivo Excel: ' + error.message);
+      }
+    }
+
+    // Função para navegação
+    function irPara(pagina) {
+      window.location.href = pagina;
+    }
+
+    // Carregar colaboradores ao iniciar
+    carregarColaboradores();
+  </script>
+</body>
+</html>

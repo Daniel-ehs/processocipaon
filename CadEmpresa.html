@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro da Empresa - Processo CIPA</title>
+  <style>
+    :root {
+      --primary-green: #28a745;
+      --dark-green: #218838;
+      --text-dark: #222;
+      --text-gray: #555;
+      --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      --employer-bg: #e6f4ea;
+      --employee-bg: #f0f8ff;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7fa;
+      margin: 0;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      width: 90%;
+      max-width: 800px;
+      margin-bottom: 2rem;
+    }
+
+    .logo-cipa {
+      width: 60px;
+      height: auto;
+      margin-right: 1rem;
+    }
+
+    .titulo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-green);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .container {
+      width: 90%;
+      max-width: 800px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-dark);
+      margin-bottom: 0.3rem;
+      text-align: left;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    input[type="number"] {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    input[readonly] {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      cursor: not-allowed;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary-green);
+      margin: 1.5rem 0 1rem;
+      text-align: center;
+    }
+
+    .display-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .representatives-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+
+    .representatives-table th,
+    .representatives-table td {
+      padding: 0.8rem;
+      text-align: left;
+      font-size: 0.9rem;
+      border: 1px solid #ddd;
+    }
+
+    .representatives-table th {
+      background-color: var(--primary-green);
+      color: white;
+      font-weight: bold;
+    }
+
+    .employer-row {
+      background-color: var(--employer-bg);
+    }
+
+    .employee-row {
+      background-color: var(--employee-bg);
+    }
+
+    .image-preview {
+      margin-top: 0.5rem;
+      max-width: 150px;
+      max-height: 150px;
+      display: none;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      background: linear-gradient(to bottom, var(--primary-green), var(--dark-green));
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      width: 120px;
+      display: block;
+      margin: 2rem auto 0;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background: var(--dark-green);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .error {
+      color: red;
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .logo-cipa {
+        width: 50px;
+      }
+
+      .titulo {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        padding: 1.5rem;
+      }
+
+      .representatives-table th,
+      .representatives-table td {
+        font-size: 0.8rem;
+        padding: 0.6rem;
+      }
+
+      .image-preview {
+        max-width: 100px;
+        max-height: 100px;
+      }
+
+      .btn {
+        width: 100px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header-container">
+    <img src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" class="logo-cipa" alt="Logo CIPA">
+    <div class="titulo">Cadastro da Empresa</div>
+  </div>
+  <div class="container">
+    <form id="empresaForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="logo">Logotipo da Empresa</label>
+          <input type="file" id="logo" accept="image/*" required>
+          <img id="logoPreview" class="image-preview" alt="Pré-visualização do Logotipo">
+          <span class="error" id="logoError">Selecione uma imagem válida (PNG, JPG, JPEG, GIF)</span>
+        </div>
+        <div class="form-group">
+          <label for="nome">Nome da Empresa</label>
+          <input type="text" id="nome" required>
+          <span class="error" id="nomeError">O nome da empresa é obrigatório</span>
+        </div>
+        <div class="form-group">
+          <label for="endereco">Endereço</label>
+          <input type="text" id="endereco" required>
+          <span class="error" id="enderecoError">O endereço é obrigatório</span>
+        </div>
+        <div class="form-group">
+          <label for="cep">CEP</label>
+          <input type="text" id="cep" maxlength="9" required>
+          <span class="error" id="cepError">CEP inválido</span>
+        </div>
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input type="text" id="telefone" maxlength="15" required>
+          <span class="error" id="telefoneError">Telefone inválido</span>
+        </div>
+        <div class="form-group">
+          <label for="cnpj">CNPJ</label>
+          <input type="text" id="cnpj" maxlength="18" required>
+          <span class="error" id="cnpjError">CNPJ inválido</span>
+        </div>
+        <div class="form-group">
+          <label for="cnae">CNAE</label>
+          <input type="text" id="cnae" maxlength="7" required>
+          <span class="error" id="cnaeError">CNAE inválido ou não encontrado</span>
+        </div>
+      </div>
+      <div class="display-group">
+        <div class="form-group">
+          <label for="grupoRisco">Grupo de Risco</label>
+          <input type="text" id="grupoRisco" readonly>
+        </div>
+        <div class="form-group">
+          <label for="setor">Setor</label>
+          <input type="text" id="setor" readonly>
+        </div>
+        <div class="form-group">
+          <label for="numColaboradores">Número de Colaboradores</label>
+          <input type="number" id="numColaboradores" readonly>
+          <span class="error" id="numColaboradoresError">Número de colaboradores inválido</span>
+        </div>
+      </div>
+      <div class="section-title">Sua empresa deverá ter <span id="totalCipa">0</span> representantes da CIPA sendo:</div>
+      <table class="representatives-table">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Efetivos</th>
+            <th>Suplentes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="employee-row">
+            <td>Representantes dos Empregados</td>
+            <td><span id="efetivosEmpregados">0</span> colaboradores</td>
+            <td><span id="suplentesEmpregados">0</span> colaboradores</td>
+          </tr>
+          <tr class="employer-row">
+            <td>Representantes do Empregador</td>
+            <td><span id="efetivosEmpregador">0</span> colaboradores</td>
+            <td><span id="suplentesEmpregador">0</span> colaboradores</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="repEmpresa">Representante da Empresa</label>
+          <input type="text" id="repEmpresa" required>
+          <span class="error" id="repEmpresaError">O representante da empresa é obrigatório</span>
+        </div>
+        <div class="form-group">
+          <label for="repCipa">Presidente da CIPA em Curso</label>
+          <input type="text" id="repCipa" required>
+          <span class="error" id="repCipaError">O presidente da CIPA é obrigatório</span>
+        </div>
+      </div>
+      <button type="submit" class="btn">Cadastrar</button>
+    </form>
+  </div>
+  <button class="btn" onclick="irPara('index.html')">Voltar</button>
+
+  <script>
+    // Tabela de CNAEs
+    // INSIRA OS DADOS DA SUA TABELA DE CNAEs AQUI
+    const cnaeTable = [
+    { cnae: "01.11-3", grupo_risco: "3", setor: "Cultivo de cereais" },
+    { cnae: "01.12-1", grupo_risco: "3", setor: "Cultivo de algodão herbáceo e de outras fibras de lavoura temporária" },
+    { cnae: "01.13-0", grupo_risco: "3", setor: "Cultivo de cana-de-açúcar" },
+    { cnae: "01.14-8", grupo_risco: "3", setor: "Cultivo de fumo" },
+    { cnae: "01.15-6", grupo_risco: "3", setor: "Cultivo de soja" },
+    { cnae: "01.16-4", grupo_risco: "3", setor: "Cultivo de oleaginosas de lavoura temporária, exceto soja" },
+    { cnae: "01.19-9", grupo_risco: "3", setor: "Cultivo de plantas de lavoura temporária não especificadas anteriormente" },
+    { cnae: "01.21-1", grupo_risco: "3", setor: "Horticultura" },
+    { cnae: "01.22-9", grupo_risco: "3", setor: "Cultivo de flores e plantas ornamentais" },
+    { cnae: "01.31-8", grupo_risco: "3", setor: "Cultivo de laranja" },
+    { cnae: "01.32-6", grupo_risco: "3", setor: "Cultivo de uva" },
+    { cnae: "01.33-4", grupo_risco: "3", setor: "Cultivo de frutas de lavoura permanente, exceto laranja e uva" },
+    { cnae: "01.34-2", grupo_risco: "3", setor: "Cultivo de café" },
+    { cnae: "01.35-1", grupo_risco: "3", setor: "Cultivo de cacau" },
+    { cnae: "01.39-3", grupo_risco: "3", setor: "Cultivo de plantas de lavoura permanente não especificadas anteriormente" },
+    { cnae: "01.41-5", grupo_risco: "3", setor: "Produção de sementes certificadas" },
+    { cnae: "01.42-3", grupo_risco: "3", setor: "Produção de mudas e outras formas de propagação vegetal, certificadas" },
+    { cnae: "01.51-2", grupo_risco: "3", setor: "Criação de bovinos" },
+    { cnae: "01.52-1", grupo_risco: "3", setor: "Criação de outros animais de grande porte" },
+    { cnae: "01.53-9", grupo_risco: "3", setor: "Criação de caprinos e ovinos" },
+    { cnae: "01.54-7", grupo_risco: "3", setor: "Criação de suínos" },
+    { cnae: "01.55-5", grupo_risco: "3", setor: "Criação de aves" },
+    { cnae: "01.59-8", grupo_risco: "3", setor: "Criação de animais não especificados anteriormente" },
+    { cnae: "01.61-0", grupo_risco: "3", setor: "Atividades de apoio à agricultura" },
+    { cnae: "01.62-8", grupo_risco: "3", setor: "Atividades de apoio à pecuária" },
+    { cnae: "01.63-6", grupo_risco: "3", setor: "Atividades de pós-colheita" },
+    { cnae: "01.70-9", grupo_risco: "3", setor: "Caça e serviços relacionados" },
+    { cnae: "02.10-1", grupo_risco: "3", setor: "Produção florestal - florestas plantadas" },
+    { cnae: "02.20-9", grupo_risco: "4", setor: "Produção florestal - florestas nativas" },
+    { cnae: "02.30-6", grupo_risco: "3", setor: "Atividades de apoio à produção florestal" },
+    { cnae: "03.11-6", grupo_risco: "3", setor: "Pesca em água salgada" },
+    { cnae: "03.12-4", grupo_risco: "3", setor: "Pesca em água doce" },
+    { cnae: "03.21-3", grupo_risco: "3", setor: "Aqüicultura em água salgada e salobra" },
+    { cnae: "03.22-1", grupo_risco: "3", setor: "Aqüicultura em água doce" },
+    { cnae: "05.00-3", grupo_risco: "4", setor: "Extração de carvão mineral" },
+    { cnae: "06.00-0", grupo_risco: "4", setor: "Extração de petróleo e gás natural" },
+    { cnae: "07.10-3", grupo_risco: "4", setor: "Extração de minério de ferro" },
+    { cnae: "07.21-9", grupo_risco: "4", setor: "Extração de minério de alumínio" },
+    { cnae: "07.22-7", grupo_risco: "4", setor: "Extração de minério de estanho" },
+    { cnae: "07.23-5", grupo_risco: "4", setor: "Extração de minério de manganês" },
+    { cnae: "07.24-3", grupo_risco: "4", setor: "Extração de minério de metais preciosos" },
+    { cnae: "07.25-1", grupo_risco: "4", setor: "Extração de minerais radioativos" },
+    { cnae: "07.29-4", grupo_risco: "4", setor: "Extração de minerais metálicos não-ferrosos não especificados anteriormente" },
+    { cnae: "08.10-0", grupo_risco: "4", setor: "Extração de pedra, areia e argila" },
+    { cnae: "08.91-6", grupo_risco: "4", setor: "Extração de minerais químicos" },
+    { cnae: "08.92-4", grupo_risco: "4", setor: "Extração e refino de sal marinho e sal-gema" },
+    { cnae: "08.93-2", grupo_risco: "4", setor: "Extração de gemas (pedras preciosas e semipreciosas)" },
+    { cnae: "08.99-1", grupo_risco: "4", setor: "Extração de minerais não-metálicos não especificados anteriormente" },
+    { cnae: "09.10-6", grupo_risco: "4", setor: "Atividades de apoio à extração de petróleo e gás natural" },
+    { cnae: "09.90-4", grupo_risco: "4", setor: "Atividades de apoio à extração de minerais, exceto petróleo e gás natural" },
+    { cnae: "10.11-2", grupo_risco: "3", setor: "Abate de reses, exceto suínos" },
+    { cnae: "10.12-1", grupo_risco: "3", setor: "Abate de suínos, aves e outros pequenos animais" },
+    { cnae: "10.13-9", grupo_risco: "3", setor: "Fabricação de produtos de carne" },
+    { cnae: "10.20-1", grupo_risco: "3", setor: "Preservação do pescado e fabricação de produtos do pescado" },
+    { cnae: "10.31-7", grupo_risco: "3", setor: "Fabricação de conservas de frutas" },
+    { cnae: "10.32-5", grupo_risco: "3", setor: "Fabricação de conservas de legumes e outros vegetais" },
+    { cnae: "10.33-3", grupo_risco: "3", setor: "Fabricação de sucos de frutas, hortaliças e legumes" },
+    { cnae: "10.41-4", grupo_risco: "3", setor: "Fabricação de óleos vegetais em bruto, exceto óleo de milho" },
+    { cnae: "10.42-2", grupo_risco: "3", setor: "Fabricação de óleos vegetais refinados, exceto óleo de milho" },
+    { cnae: "10.43-1", grupo_risco: "3", setor: "Fabricação de margarina e outras gorduras vegetais e de óleos não-comestíveis de animais" },
+    { cnae: "10.51-1", grupo_risco: "3", setor: "Preparação do leite" },
+    { cnae: "10.52-0", grupo_risco: "3", setor: "Fabricação de laticínios" },
+    { cnae: "10.53-8", grupo_risco: "3", setor: "Fabricação de sorvetes e outros gelados comestíveis" },
+    { cnae: "10.61-9", grupo_risco: "3", setor: "Beneficiamento de arroz e fabricação de produtos do arroz" },
+    { cnae: "10.62-7", grupo_risco: "3", setor: "Moagem de trigo e fabricação de derivados" },
+    { cnae: "10.63-5", grupo_risco: "3", setor: "Fabricação de farinha de mandioca e derivados" },
+    { cnae: "10.64-3", grupo_risco: "3", setor: "Fabricação de farinha de milho e derivados, exceto óleos de milho" },
+    { cnae: "10.65-1", grupo_risco: "3", setor: "Fabricação de amidos e féculas de vegetais e de óleos de milho" },
+    { cnae: "10.66-0", grupo_risco: "3", setor: "Fabricação de alimentos para animais" },
+    { cnae: "10.69-4", grupo_risco: "3", setor: "Moagem e fabricação de produtos de origem vegetal não especificados anteriormente" },
+    { cnae: "10.71-6", grupo_risco: "3", setor: "Fabricação de açúcar em bruto" },
+    { cnae: "10.72-4", grupo_risco: "3", setor: "Fabricação de açúcar refinado" },
+    { cnae: "10.81-3", grupo_risco: "3", setor: "Torrefação e moagem de café" },
+    { cnae: "10.82-1", grupo_risco: "3", setor: "Fabricação de produtos à base de café" },
+    { cnae: "10.91-1", grupo_risco: "3", setor: "Fabricação de produtos de panificação" },
+    { cnae: "10.92-9", grupo_risco: "3", setor: "Fabricação de biscoitos e bolachas" },
+    { cnae: "10.93-7", grupo_risco: "3", setor: "Fabricação de produtos derivados do cacau, de chocolates e confeitos" },
+    { cnae: "10.94-5", grupo_risco: "3", setor: "Fabricação de massas alimentícias" },
+    { cnae: "10.95-3", grupo_risco: "3", setor: "Fabricação de especiarias, molhos, temperos e condimentos" },
+    { cnae: "10.96-1", grupo_risco: "3", setor: "Fabricação de alimentos e pratos prontos" },
+    { cnae: "10.99-6", grupo_risco: "3", setor: "Fabricação de produtos alimentícios não especificados anteriormente" },
+    { cnae: "11.11-9", grupo_risco: "3", setor: "Fabricação de aguardentes e outras bebidas destiladas" },
+    { cnae: "11.12-7", grupo_risco: "3", setor: "Fabricação de vinho" },
+    { cnae: "11.13-5", grupo_risco: "3", setor: "Fabricação de malte, cervejas e chopes" },
+    { cnae: "11.21-6", grupo_risco: "3", setor: "Fabricação de águas envasadas" },
+    { cnae: "11.22-4", grupo_risco: "3", setor: "Fabricação de refrigerantes e de outras bebidas não-alcoólicas" },
+    { cnae: "12.10-7", grupo_risco: "3", setor: "Processamento industrial do fumo" },
+    { cnae: "12.20-4", grupo_risco: "3", setor: "Fabricação de produtos do fumo" },
+    { cnae: "13.11-1", grupo_risco: "3", setor: "Preparação e fiação de fibras de algodão" },
+    { cnae: "13.12-0", grupo_risco: "3", setor: "Preparação e fiação de fibras têxteis naturais, exceto algodão" },
+    { cnae: "13.13-8", grupo_risco: "3", setor: "Fiação de fibras artificiais e sintéticas" },
+    { cnae: "13.14-6", grupo_risco: "3", setor: "Fabricação de linhas para costurar e bordar" },
+    { cnae: "13.21-9", grupo_risco: "3", setor: "Tecelagem de fios de algodão" },
+    { cnae: "13.22-7", grupo_risco: "3", setor: "Tecelagem de fios de fibras têxteis naturais, exceto algodão" },
+    { cnae: "13.23-5", grupo_risco: "3", setor: "Tecelagem de fios de fibras artificiais e sintéticas" },
+    { cnae: "13.30-8", grupo_risco: "3", setor: "Fabricação de tecidos de malha" },
+    { cnae: "13.40-5", grupo_risco: "3", setor: "Acabamentos em fios, tecidos e artefatos têxteis" },
+    { cnae: "13.51-1", grupo_risco: "3", setor: "Fabricação de artefatos têxteis para uso doméstico" },
+    { cnae: "13.52-9", grupo_risco: "3", setor: "Fabricação de artefatos de tapeçaria" },
+    { cnae: "13.53-7", grupo_risco: "3", setor: "Fabricação de artefatos de cordoaria" },
+    { cnae: "13.54-5", grupo_risco: "3", setor: "Fabricação de tecidos especiais, inclusive artefatos" },
+    { cnae: "13.59-6", grupo_risco: "3", setor: "Fabricação de outros produtos têxteis não especificados anteriormente" },
+    { cnae: "14.11-8", grupo_risco: "2", setor: "Confecção de roupas íntimas" },
+    { cnae: "14.12-6", grupo_risco: "2", setor: "Confecção de peças do vestuário, exceto roupas íntimas" },
+    { cnae: "14.13-4", grupo_risco: "2", setor: "Confecção de roupas profissionais" },
+    { cnae: "14.14-2", grupo_risco: "2", setor: "Fabricação de acessórios do vestuário, exceto para segurança e proteção" },
+    { cnae: "14.21-5", grupo_risco: "2", setor: "Fabricação de meias" },
+    { cnae: "14.22-3", grupo_risco: "2", setor: "Fabricação de artigos do vestuário, produzidos em malharias e tricotagens, exceto meias" },
+    { cnae: "15.10-6", grupo_risco: "3", setor: "Curtimento e outras preparações de couro" },
+    { cnae: "15.21-1", grupo_risco: "2", setor: "Fabricação de artigos para viagem, bolsas e semelhantes de qualquer material" },
+    { cnae: "15.29-7", grupo_risco: "2", setor: "Fabricação de artefatos de couro não especificados anteriormente" },
+    { cnae: "15.31-9", grupo_risco: "3", setor: "Fabricação de calçados de couro" },
+    { cnae: "15.32-7", grupo_risco: "3", setor: "Fabricação de tênis de qualquer material" },
+    { cnae: "15.33-5", grupo_risco: "3", setor: "Fabricação de calçados de material sintético" },
+    { cnae: "15.39-4", grupo_risco: "3", setor: "Fabricação de calçados de materiais não especificados anteriormente" },
+    { cnae: "15.40-8", grupo_risco: "3", setor: "Fabricação de partes para calçados, de qualquer material" },
+    { cnae: "16.10-2", grupo_risco: "3", setor: "Desdobramento de madeira" },
+    { cnae: "16.21-8", grupo_risco: "3", setor: "Fabricação de madeira laminada e de chapas de madeira compensada, prensada e aglomerada" },
+    { cnae: "16.22-6", grupo_risco: "3", setor: "Fabricação de estruturas de madeira e de artigos de carpintaria para construção" },
+    { cnae: "16.23-4", grupo_risco: "3", setor: "Fabricação de artefatos de tanoaria e de embalagens de madeira" },
+    { cnae: "16.29-3", grupo_risco: "3", setor: "Fabricação de artefatos de madeira, palha, cortiça, vime e material trançado não especificados anteriormente, exceto móveis" },
+    { cnae: "17.10-9", grupo_risco: "3", setor: "Fabricação de celulose e outras pastas para a fabricação de papel" },
+    { cnae: "17.21-4", grupo_risco: "3", setor: "Fabricação de papel" },
+    { cnae: "17.22-2", grupo_risco: "3", setor: "Fabricação de cartolina e papel-cartão" },
+    { cnae: "17.31-1", grupo_risco: "2", setor: "Fabricação de embalagens de papel" },
+    { cnae: "17.32-0", grupo_risco: "2", setor: "Fabricação de embalagens de cartolina e papel-cartão" },
+    { cnae: "17.33-8", grupo_risco: "2", setor: "Fabricação de chapas e de embalagens de papelão ondulado" },
+    { cnae: "17.41-9", grupo_risco: "2", setor: "Fabricação de produtos de papel, cartolina, papel-cartão e papelão ondulado para uso comercial e de escritório" },
+    { cnae: "17.42-7", grupo_risco: "2", setor: "Fabricação de produtos de papel para usos doméstico e higiênico-sanitário" },
+    { cnae: "17.49-4", grupo_risco: "2", setor: "Fabricação de produtos de pastas celulósicas, papel, cartolina, papel-cartão e papelão ondulado não especificados anteriormente" },
+    { cnae: "18.11-3", grupo_risco: "3", setor: "Impressão de jornais, livros, revistas e outras publicações periódicas" },
+    { cnae: "18.12-1", grupo_risco: "3", setor: "Impressão de material de segurança" },
+    { cnae: "18.13-0", grupo_risco: "3", setor: "Impressão de materiais para outros usos" },
+    { cnae: "18.21-1", grupo_risco: "3", setor: "Serviços de pré-impressão" },
+    { cnae: "18.22-9", grupo_risco: "3", setor: "Serviços de acabamentos gráficos" },
+    { cnae: "18.30-0", grupo_risco: "3", setor: "Reprodução de materiais gravados em qualquer suporte" },
+    { cnae: "19.10-1", grupo_risco: "3", setor: "Coquerias" },
+    { cnae: "19.21-7", grupo_risco: "3", setor: "Fabricação de produtos do refino de petróleo" },
+    { cnae: "19.22-5", grupo_risco: "3", setor: "Fabricação de produtos derivados do petróleo, exceto produtos do refino" },
+    { cnae: "19.31-4", grupo_risco: "3", setor: "Fabricação de álcool" },
+    { cnae: "19.32-2", grupo_risco: "3", setor: "Fabricação de biocombustíveis, exceto álcool" },
+    { cnae: "20.11-8", grupo_risco: "3", setor: "Fabricação de cloro e álcalis" },
+    { cnae: "20.12-6", grupo_risco: "3", setor: "Fabricação de intermediários para fertilizantes" },
+    { cnae: "20.13-4", grupo_risco: "3", setor: "Fabricação de adubos e fertilizantes" },
+    { cnae: "20.14-2", grupo_risco: "3", setor: "Fabricação de gases industriais" },
+    { cnae: "20.19-3", grupo_risco: "3", setor: "Fabricação de produtos químicos inorgânicos não especificados anteriormente" },
+    { cnae: "20.21-5", grupo_risco: "3", setor: "Fabricação de produtos petroquímicos básicos" },
+    { cnae: "20.22-3", grupo_risco: "3", setor: "Fabricação de intermediários para plastificantes, resinas e fibras" },
+    { cnae: "20.29-1", grupo_risco: "3", setor: "Fabricação de produtos químicos orgânicos não especificados anteriormente" },
+    { cnae: "20.31-2", grupo_risco: "3", setor: "Fabricação de resinas termoplásticas" },
+    { cnae: "20.32-1", grupo_risco: "3", setor: "Fabricação de resinas termofixas" },
+    { cnae: "20.33-9", grupo_risco: "3", setor: "Fabricação de elastômeros" },
+    { cnae: "20.40-1", grupo_risco: "3", setor: "Fabricação de fibras artificiais e sintéticas" },
+    { cnae: "20.51-7", grupo_risco: "3", setor: "Fabricação de defensivos agrícolas" },
+    { cnae: "20.52-5", grupo_risco: "3", setor: "Fabricação de desinfetantes domissanitários" },
+    { cnae: "20.61-4", grupo_risco: "3", setor: "Fabricação de sabões e detergentes sintéticos" },
+    { cnae: "20.62-2", grupo_risco: "3", setor: "Fabricação de produtos de limpeza e polimento" },
+    { cnae: "20.63-1", grupo_risco: "2", setor: "Fabricação de cosméticos, produtos de perfumaria e de higiene pessoal" },
+    { cnae: "20.71-1", grupo_risco: "3", setor: "Fabricação de tintas, vernizes, esmaltes e lacas" },
+    { cnae: "20.72-0", grupo_risco: "3", setor: "Fabricação de tintas de impressão" },
+    { cnae: "20.73-8", grupo_risco: "3", setor: "Fabricação de impermeabilizantes, solventes e produtos afins" },
+    { cnae: "20.91-6", grupo_risco: "3", setor: "Fabricação de adesivos e selantes" },
+    { cnae: "20.92-4", grupo_risco: "4", setor: "Fabricação de explosivos" },
+    { cnae: "20.93-2", grupo_risco: "3", setor: "Fabricação de aditivos de uso industrial" },
+    { cnae: "20.94-1", grupo_risco: "3", setor: "Fabricação de catalisadores" },
+    { cnae: "20.99-1", grupo_risco: "3", setor: "Fabricação de produtos químicos não especificados anteriormente" },
+    { cnae: "21.10-6", grupo_risco: "3", setor: "Fabricação de produtos farmoquímicos" },
+    { cnae: "21.21-1", grupo_risco: "3", setor: "Fabricação de medicamentos para uso humano" },
+    { cnae: "21.22-0", grupo_risco: "3", setor: "Fabricação de medicamentos para uso veterinário" },
+    { cnae: "21.23-8", grupo_risco: "3", setor: "Fabricação de preparações farmacêuticas" },
+    { cnae: "22.11-1", grupo_risco: "3", setor: "Fabricação de pneumáticos e de câmaras-de-ar" },
+    { cnae: "22.12-9", grupo_risco: "3", setor: "Reforma de pneumáticos usados" },
+    { cnae: "22.19-6", grupo_risco: "3", setor: "Fabricação de artefatos de borracha não especificados anteriormente" },
+    { cnae: "22.21-8", grupo_risco: "3", setor: "Fabricação de laminados planos e tubulares de material plástico" },
+    { cnae: "22.22-6", grupo_risco: "3", setor: "Fabricação de embalagens de material plástico" },
+    { cnae: "22.23-4", grupo_risco: "3", setor: "Fabricação de tubos e acessórios de material plástico para uso na construção" },
+    { cnae: "22.29-3", grupo_risco: "3", setor: "Fabricação de artefatos de material plástico não especificados anteriormente" },
+    { cnae: "23.11-7", grupo_risco: "3", setor: "Fabricação de vidro plano e de segurança" },
+    { cnae: "23.12-5", grupo_risco: "3", setor: "Fabricação de embalagens de vidro" },
+    { cnae: "23.19-2", grupo_risco: "3", setor: "Fabricação de artigos de vidro" },
+    { cnae: "23.20-6", grupo_risco: "4", setor: "Fabricação de cimento" },
+    { cnae: "23.30-3", grupo_risco: "4", setor: "Fabricação de artefatos de concreto, cimento, fibrocimento, gesso e materiais semelhantes" },
+    { cnae: "23.41-9", grupo_risco: "4", setor: "Fabricação de produtos cerâmicos refratários" },
+    { cnae: "23.42-7", grupo_risco: "3", setor: "Fabricação de produtos cerâmicos não-refratários para uso estrutural na construção" },
+    { cnae: "23.49-4", grupo_risco: "4", setor: "Fabricação de produtos cerâmicos não-refratários não especificados anteriormente" },
+    { cnae: "23.91-5", grupo_risco: "3", setor: "Aparelhamento e outros trabalhos em pedras" },
+    { cnae: "23.92-3", grupo_risco: "4", setor: "Fabricação de cal e gesso" },
+    { cnae: "23.99-1", grupo_risco: "3", setor: "Fabricação de produtos de minerais não-metálicos não especificados anteriormente" },
+    { cnae: "24.11-3", grupo_risco: "4", setor: "Produção de ferro-gusa" },
+    { cnae: "24.12-1", grupo_risco: "4", setor: "Produção de ferroligas" },
+    { cnae: "24.21-1", grupo_risco: "4", setor: "Produção de semi-acabados de aço" },
+    { cnae: "24.22-9", grupo_risco: "4", setor: "Produção de laminados planos de aço" },
+    { cnae: "24.23-7", grupo_risco: "4", setor: "Produção de laminados longos de aço" },
+    { cnae: "24.24-5", grupo_risco: "4", setor: "Produção de relaminados, trefilados e perfilados de aço" },
+    { cnae: "24.31-8", grupo_risco: "4", setor: "Produção de tubos de aço com costura" },
+    { cnae: "24.39-3", grupo_risco: "4", setor: "Produção de outros tubos de ferro e aço" },
+    { cnae: "24.41-5", grupo_risco: "4", setor: "Metalurgia do alumínio e suas ligas" },
+    { cnae: "24.42-3", grupo_risco: "4", setor: "Metalurgia dos metais preciosos" },
+    { cnae: "24.43-1", grupo_risco: "4", setor: "Metalurgia do cobre" },
+    { cnae: "24.49-1", grupo_risco: "4", setor: "Metalurgia dos metais não-ferrosos e suas ligas não especificados anteriormente" },
+    { cnae: "24.51-2", grupo_risco: "4", setor: "Fundição de ferro e aço" },
+    { cnae: "24.52-1", grupo_risco: "4", setor: "Fundição de metais não-ferrosos e suas ligas" },
+    { cnae: "25.11-0", grupo_risco: "4", setor: "Fabricação de estruturas metálicas" },
+    { cnae: "25.12-8", grupo_risco: "3", setor: "Fabricação de esquadrias de metal" },
+    { cnae: "25.13-6", grupo_risco: "3", setor: "Fabricação de obras de caldeiraria pesada" },
+    { cnae: "25.21-7", grupo_risco: "3", setor: "Fabricação de tanques, reservatórios metálicos e caldeiras para aquecimento central" },
+    { cnae: "25.22-5", grupo_risco: "3", setor: "Fabricação de caldeiras geradoras de vapor, exceto para aquecimento central e para veículos" },
+    { cnae: "25.31-4", grupo_risco: "4", setor: "Produção de forjados de aço e de metais não-ferrosos e suas ligas" },
+    { cnae: "25.32-2", grupo_risco: "4", setor: "Produção de artefatos estampados de metal; metalurgia do pó" },
+    { cnae: "25.39-0", grupo_risco: "4", setor: "Serviços de usinagem, solda, tratamento e revestimento em metais" },
+    { cnae: "25.41-1", grupo_risco: "3", setor: "Fabricação de artigos de cutelaria" },
+    { cnae: "25.42-0", grupo_risco: "3", setor: "Fabricação de artigos de serralheria, exceto esquadrias" },
+    { cnae: "25.43-8", grupo_risco: "3", setor: "Fabricação de ferramentas" },
+    { cnae: "25.50-1", grupo_risco: "4", setor: "Fabricação de equipamento bélico pesado, armas de fogo e munições" },
+    { cnae: "25.91-8", grupo_risco: "3", setor: "Fabricação de embalagens metálicas" },
+    { cnae: "25.92-6", grupo_risco: "4", setor: "Fabricação de produtos de trefilados de metal" },
+    { cnae: "25.93-4", grupo_risco: "3", setor: "Fabricação de artigos de metal para uso doméstico e pessoal" },
+    { cnae: "25.99-3", grupo_risco: "3", setor: "Fabricação de produtos de metal não especificados anteriormente" },
+    { cnae: "26.10-8", grupo_risco: "3", setor: "Fabricação de componentes eletrônicos" },
+    { cnae: "26.21-3", grupo_risco: "3", setor: "Fabricação de equipamentos de informática" },
+    { cnae: "26.22-1", grupo_risco: "3", setor: "Fabricação de periféricos para equipamentos de informática" },
+    { cnae: "26.31-1", grupo_risco: "3", setor: "Fabricação de equipamentos transmissores de comunicação" },
+    { cnae: "26.32-9", grupo_risco: "3", setor: "Fabricação de aparelhos telefônicos e de outros equipamentos de comunicação" },
+    { cnae: "26.40-0", grupo_risco: "3", setor: "Fabricação de aparelhos de recepção, reprodução, gravação e amplificação de áudio e vídeo" },
+    { cnae: "26.51-5", grupo_risco: "3", setor: "Fabricação de aparelhos e equipamentos de medida, teste e controle" },
+    { cnae: "26.52-3", grupo_risco: "3", setor: "Fabricação de cronômetros e relógios" },
+    { cnae: "26.70-1", grupo_risco: "3", setor: "Fabricação de equipamentos e instrumentos ópticos, fotográficos e cinematográficos" },
+    { cnae: "26.80-9", grupo_risco: "3", setor: "Fabricação de mídias virgens, magnéticas e ópticas" },
+    { cnae: "27.10-4", grupo_risco: "3", setor: "Fabricação de geradores, transformadores e motores elétricos" },
+    { cnae: "27.21-0", grupo_risco: "3", setor: "Fabricação de automotores" },
+    { cnae: "27.22-8", grupo_risco: "3", setor: "Fabricação de baterias e acumuladores para veículos automotores" },
+    { cnae: "27.31-7", grupo_risco: "3", setor: "Fabricação de aparelhos e equipamentos para distribuição e controle de energia elétrica" },
+    { cnae: "27.32-5", grupo_risco: "3", setor: "Fabricação de material elétrico para instalações em circuito de consumo" },
+    { cnae: "27.33-3", grupo_risco: "3", setor: "Fabricação de fios, cabos e condutores elétricos isolados" },
+    { cnae: "27.40-6", grupo_risco: "3", setor: "Fabricação de lâmpadas e outros equipamentos de iluminação" },
+    { cnae: "27.51-1", grupo_risco: "3", setor: "Fabricação de fogões, refrigeradores e máquinas de lavar e secar para uso doméstico" },
+    { cnae: "27.59-7", grupo_risco: "3", setor: "Fabricação de aparelhos eletrodomésticos não especificados anteriormente" },
+    { cnae: "27.90-2", grupo_risco: "3", setor: "Fabricação de equipamentos e aparelhos elétricos não especificados anteriormente" },
+    { cnae: "28.11-9", grupo_risco: "3", setor: "Fabricação de motores e turbinas, exceto para aviões e veículos rodoviários" },
+    { cnae: "28.12-7", grupo_risco: "3", setor: "Fabricação de equipamentos hidráulicos e pneumáticos, exceto válvulas" },
+    { cnae: "28.13-5", grupo_risco: "3", setor: "Fabricação de válvulas, registros e dispositivos semelhantes" },
+    { cnae: "28.14-3", grupo_risco: "3", setor: "Fabricação de compressores" },
+    { cnae: "28.15-1", grupo_risco: "3", setor: "Fabricação de equipamentos de transmissão para fins industriais" },
+    { cnae: "28.21-6", grupo_risco: "3", setor: "Fabricação de aparelhos e equipamentos para instalações térmicas" },
+    { cnae: "28.22-4", grupo_risco: "3", setor: "Fabricação de máquinas, equipamentos e aparelhos para transporte e elevação de cargas e pessoas" },
+    { cnae: "28.23-2", grupo_risco: "3", setor: "Fabricação de máquinas e aparelhos de refrigeração e ventilação para uso industrial e comercial" },
+    { cnae: "28.24-1", grupo_risco: "3", setor: "Fabricação de aparelhos e equipamentos de ar-condicionado" },
+    { cnae: "28.25-9", grupo_risco: "3", setor: "Fabricação de máquinas e equipamentos para saneamento básico e ambiental" },
+    { cnae: "28.29-1", grupo_risco: "3", setor: "Fabricação de máquinas e equipamentos de uso geral não especificados anteriormente" },
+    { cnae: "28.31-3", grupo_risco: "3", setor: "Fabricação de tratores agrícolas" },
+    { cnae: "28.32-1", grupo_risco: "3", setor: "Fabricação de equipamentos para irrigação agrícola" },
+    { cnae: "28.33-0", grupo_risco: "3", setor: "Fabricação de máquinas e equipamentos para a agricultura e pecuária, exceto para irrigação" },
+    { cnae: "28.40-2", grupo_risco: "3", setor: "Fabricação de máquinas-ferramenta" },
+    { cnae: "28.51-8", grupo_risco: "3", setor: "Fabricação de máquinas e equipamentos para a prospecção e extração de petróleo" },
+    { cnae: "28.52-6", grupo_risco: "3", setor: "Fabricação de outras máquinas e equipamentos para uso na extração mineral, exceto na extração de petróleo" },
+    { cnae: "28.53-4", grupo_risco: "3", setor: "Fabricação de tratores, exceto agrícolas" },
+    { cnae: "28.54-2", grupo_risco: "3", setor: "Fabricação de máquinas e equipamentos para terraplenagem, pavimentação e construção, exceto tratores" },
+    { cnae: "28.61-5", grupo_risco: "3", setor: "Fabricação de máquinas para a indústria metalúrgica, exceto máquinas-ferramenta" },
+    { cnae: "28.62-3", grupo_risco: "3", setor: "Fabricação de máquinas e equipamentos para as indústrias de alimentos, bebidas e fumo" },
+    { cnae: "28.63-1", grupo_risco: "3", setor: "Fabricação de máquinas e equipamentos para a indústria têxtil" },
+    { cnae: "28.64-0", grupo_risco: "3", setor: "Fabricação de máquinas e equipamentos para as indústrias do vestuário, do couro e de calçados" },
+    { cnae: "28.65-8", grupo_risco: "3", setor: "Fabricação de máquinas e equipamentos" },
+    { cnae: "28.66-6", grupo_risco: "3", setor: "Fabricação de máquinas e equipamentos para a indústria do plástico" },
+    { cnae: "28.69-1", grupo_risco: "3", setor: "Fabricação de maquinas" },
+    { cnae: "29.10-7", grupo_risco: "3", setor: "Fabricação de automóveis, camionetas e utilitários" },
+    { cnae: "29.20-4", grupo_risco: "3", setor: "Fabricação de caminhões e ônibus" },
+    { cnae: "29.30-1", grupo_risco: "3", setor: "Fabricação de cabines, carrocerias e reboques para veículos automotores" },
+    { cnae: "29.41-7", grupo_risco: "3", setor: "Fabricação de peças e acessórios para o sistema motor de veículos automotores" },
+    { cnae: "29.42-5", grupo_risco: "3", setor: "Fabricação de peças e acessórios para o sistemas de marcha e trasmissão de veicuos automotores" },
+    { cnae: "29.43-3", grupo_risco: "3", setor: "Fabricação de peças e acessórios para o sistema de freios de veículos automotores" },
+    { cnae: "29.44-1", grupo_risco: "3", setor: "Fabricação de peças e acessórios para o sistema de direção e suspensão de veículos automotores" },
+    { cnae: "29.45-0", grupo_risco: "3", setor: "Fabricação de material elétrico e eletrôncio para veiculos automotores exceto baterias" },
+    { cnae: "29.49-2", grupo_risco: "3", setor: "Fabricação de peças e acessórios para veiculos automotores não especificados anteriormente" },
+    { cnae: "29.50-6", grupo_risco: "3", setor: "Recondicionamento e recuperação de motores para veículos automotores" },
+    { cnae: "30.11-3", grupo_risco: "3", setor: "Construção de embarcações e estruturas flutuantes" },
+    { cnae: "30.12-1", grupo_risco: "3", setor: "Construção de embarcações para esporte e lazer" },
+    { cnae: "30.31-8", grupo_risco: "3", setor: "Fabricação de locomotivas, vagões e outros materiais rodantes" },
+    { cnae: "30.32-6", grupo_risco: "3", setor: "Fabricação de peças e acessórios para veículos ferroviários" },
+    { cnae: "30.41-5", grupo_risco: "3", setor: "Fabricação de aeronaves" },
+    { cnae: "30.42-3", grupo_risco: "3", setor: "Fabricação de turbinas, motores e outros componentes e peças para aeronaves" },
+    { cnae: "30.50-4", grupo_risco: "3", setor: "Fabricação de veículos militares de combate" },
+    { cnae: "30.91-1", grupo_risco: "3", setor: "Fabricação de motocicletas" },
+    { cnae: "30.92-0", grupo_risco: "3", setor: "Fabricação de bicicletas e triciclos não-motorizados" },
+    { cnae: "30.99-7", grupo_risco: "3", setor: "Fabricação de equipamentos de transporte não especificados anteriormente" },
+    { cnae: "31.01-2", grupo_risco: "3", setor: "Fabricação de móveis com predominância de madeira" },
+    { cnae: "31.02-1", grupo_risco: "3", setor: "Fabricação de móveis com predominância de metal" },
+    { cnae: "31.03-9", grupo_risco: "3", setor: "Fabricação de móveis de outros materiais, exceto madeira e metal" },
+    { cnae: "31.04-7", grupo_risco: "2", setor: "Fabricação de colchões" },
+    { cnae: "32.11-6", grupo_risco: "3", setor: "Lapidação de gemas e fabricação de artefatos de ourivesaria e joalheria" },
+    { cnae: "32.12-4", grupo_risco: "3", setor: "Fabricação de bijuterias e artefatos semelhantes" },
+    { cnae: "32.20-5", grupo_risco: "3", setor: "Fabricação de instrumentos musicais" },
+    { cnae: "32.30-2", grupo_risco: "3", setor: "Fabricação de artefatos para pesca e esporte" },
+    { cnae: "32.40-0", grupo_risco: "3", setor: "Fabricação de brinquedos e jogos recreativos" },
+    { cnae: "32.50-7", grupo_risco: "3", setor: "Fabricação de instrumentos e materiais para uso médico e odontológico e de artigos ópticos" },
+    { cnae: "32.91-4", grupo_risco: "3", setor: "Fabricação de escovas, pincéis e vassouras" },
+    { cnae: "32.92-2", grupo_risco: "3", setor: "Fabricação de equipamentos e acessórios para segurança e proteção pessoal e profissional" },
+    { cnae: "32.99-0", grupo_risco: "3", setor: "Fabricação de produtos diversos não especificados anteriormente" },
+    { cnae: "33.11-2", grupo_risco: "3", setor: "Manutenção e reparação de tanques, reservatórios metálicos e caldeiras, exceto para veículos" },
+    { cnae: "33.12-1", grupo_risco: "3", setor: "Manutenção e reparação de equipamentos eletrônicos e ópticos" },
+    { cnae: "33.13-9", grupo_risco: "3", setor: "Manutenção e reparação de máquinas e equipamentos elétricos" },
+    { cnae: "33.14-7", grupo_risco: "3", setor: "Manutenção e reparação de máquinas e equipamentos da indústria mecânica" },
+    { cnae: "33.15-5", grupo_risco: "3", setor: "Manutenção e reparação de veículos ferroviários" },
+    { cnae: "33.16-3", grupo_risco: "3", setor: "Manutenção e reparação de aeronaves" },
+    { cnae: "33.17-1", grupo_risco: "3", setor: "Manutenção e reparação de embarcações" },
+    { cnae: "33.19-8", grupo_risco: "3", setor: "Manutenção e reparação de equipamentos e produtos não especificados anteriormente" },
+    { cnae: "33.21-0", grupo_risco: "3", setor: "Instalação de máquinas e equipamentos industriais" },
+    { cnae: "33.29-5", grupo_risco: "3", setor: "Instalação de equipamentos não especificados anteriormente" },
+    { cnae: "35.11-5", grupo_risco: "3", setor: "Geração de energia elétrica" },
+    { cnae: "35.12-3", grupo_risco: "3", setor: "Transmissão de energia elétrica" },
+    { cnae: "35.13-1", grupo_risco: "3", setor: "Comércio atacadista de energia elétrica" },
+    { cnae: "35.14-0", grupo_risco: "3", setor: "Distribuição de energia elétrica" },
+    { cnae: "35.20-4", grupo_risco: "3", setor: "Produção de gás; processamento de gás natural; distribuição de combustíveis gasosos por redes urbanas" },
+    { cnae: "35.30-1", grupo_risco: "3", setor: "Produção e distribuição de vapor, água quente e ar-condicionado" },
+    { cnae: "36.00-6", grupo_risco: "3", setor: "Captação, tratamento e distribuição de água" },
+    { cnae: "37.01-1", grupo_risco: "3", setor: "Gestão de redes de esgoto" },
+    { cnae: "37.02-9", grupo_risco: "3", setor: "Atividades relacionadas a esgoto, exceto a gestão de redes" },
+    { cnae: "38.11-4", grupo_risco: "3", setor: "Coleta de resíduos não-perigosos" },
+    { cnae: "38.12-2", grupo_risco: "3", setor: "Coleta de resíduos perigosos" },
+    { cnae: "38.21-1", grupo_risco: "3", setor: "Tratamento e disposição de resíduos não-perigosos" },
+    { cnae: "38.22-0", grupo_risco: "3", setor: "Tratamento e disposição de resíduos perigosos" },
+    { cnae: "38.31-9", grupo_risco: "3", setor: "Recuperação de materiais metálicos" },
+    { cnae: "38.32-7", grupo_risco: "3", setor: "Recuperação de materiais plásticos" },
+    { cnae: "38.39-4", grupo_risco: "3", setor: "Recuperação de materiais não especificados anteriormente" },
+    { cnae: "39.00-5", grupo_risco: "3", setor: "Descontaminação e outros serviços de gestão de resíduos" },
+    { cnae: "41.10-7", grupo_risco: "1", setor: "Incorporação de empreendimentos imobiliários" },
+    { cnae: "41.20-4", grupo_risco: "3", setor: "Construção de edifícios" },
+    { cnae: "42.11-1", grupo_risco: "4", setor: "Construção de rodovias e ferrovias" },
+    { cnae: "42.12-0", grupo_risco: "4", setor: "Construção de obras-de-arte especiais" },
+    { cnae: "42.13-8", grupo_risco: "3", setor: "Obras de urbanização - ruas, praças e calçadas" },
+    { cnae: "42.21-9", grupo_risco: "4", setor: "Obras para geração e distribuição de energia elétrica e para telecomunicações" },
+    { cnae: "42.22-7", grupo_risco: "4", setor: "Construção de redes de abastecimento de água, coleta de esgoto e construções correlatas" },
+    { cnae: "42.23-5", grupo_risco: "4", setor: "Construção de redes de transportes por dutos, exceto para água e esgoto" },
+    { cnae: "42.91-0", grupo_risco: "4", setor: "Obras portuárias, marítimas e fluviais" },
+    { cnae: "42.92-8", grupo_risco: "4", setor: "Montagem de instalações industriais e de estruturas metálicas" },
+    { cnae: "42.99-5", grupo_risco: "3", setor: "Obras de engenharia civil não especificadas anteriormente" },
+    { cnae: "43.11-8", grupo_risco: "4", setor: "Demolição e preparação de canteiros de obras" },
+    { cnae: "43.12-6", grupo_risco: "4", setor: "Perfurações e sondagens" },
+    { cnae: "43.13-4", grupo_risco: "3", setor: "Obras de terraplenagem" },
+    { cnae: "43.19-3", grupo_risco: "3", setor: "Serviços de preparação do terreno não especificados anteriormente" },
+    { cnae: "43.21-5", grupo_risco: "3", setor: "Instalações elétricas" },
+    { cnae: "43.22-3", grupo_risco: "3", setor: "Instalações hidráulicas, de sistemas de ventilação e refrigeração" },
+    { cnae: "43.29-1", grupo_risco: "3", setor: "Obras de instalações em construções não especificadas anteriormente" },
+    { cnae: "43.30-4", grupo_risco: "3", setor: "Obras de acabamento" },
+    { cnae: "43.91-6", grupo_risco: "4", setor: "Obras de fundações" },
+    { cnae: "43.99-1", grupo_risco: "3", setor: "Serviços especializados para construção não especificados anteriormente" },
+    { cnae: "45.11-1", grupo_risco: "2", setor: "Comércio a varejo e por atacado de veículos automotores" },
+    { cnae: "45.12-9", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio de veículos automotores" },
+    { cnae: "45.20-0", grupo_risco: "3", setor: "Manutenção e reparação de veículos automotores" },
+    { cnae: "45.30-7", grupo_risco: "2", setor: "Comércio de peças e acessórios para veículos automotores" },
+    { cnae: "45.41-2", grupo_risco: "2", setor: "Comércio por atacado e a varejo de motocicletas, peças e acessórios" },
+    { cnae: "45.42-1", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio de motocicletas, peças e acessórios" },
+    { cnae: "45.43-9", grupo_risco: "3", setor: "Manutenção e reparação de motocicletas" },
+    { cnae: "46.11-7", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio de matérias-primas agrícolas e animais vivos" },
+    { cnae: "46.12-5", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio de combustíveis, minerais, produtos siderúrgicos e químicos" },
+    { cnae: "46.13-3", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio de madeira, material de construção e ferragens" },
+    { cnae: "46.14-1", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio de máquinas, equipamentos, embarcações e aeronaves" },
+    { cnae: "46.15-0", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio de eletrodomésticos, móveis e artigos de uso doméstico" },
+    { cnae: "46.16-8", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio de têxteis, vestuário, calçados e artigos de viagem" },
+    { cnae: "46.17-6", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio de produtos alimentícios, bebidas e fumo" },
+    { cnae: "46.18-4", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio especializado em produtos não especificados anteriormente" },
+    { cnae: "46.19-2", grupo_risco: "2", setor: "Representantes comerciais e agentes do comércio de mercadorias em geral não especializado" },
+    { cnae: "46.21-4", grupo_risco: "2", setor: "Comércio atacadista de café em grão" },
+    { cnae: "46.22-2", grupo_risco: "2", setor: "Comércio atacadista de soja" },
+    { cnae: "46.23-1", grupo_risco: "2", setor: "Comércio atacadista de animais vivos,   alimentos  para  animais e matérias-primas agrícolas, exceto café e soja     " },
+    { cnae: "46.31-1", grupo_risco: "2", setor: "Comércio atacadista de leite e laticínios                   " },
+    { cnae: "46.32-0", grupo_risco: "2", setor: "Comércio atacadista de cereais e leguminosas beneficiados, farinhas, amidos e féculas      " },
+    { cnae: "46.33-8", grupo_risco: "2", setor: "Comércio atacadista de hortifrutigranjeiros                   " },
+    { cnae: "46.34-6", grupo_risco: "2", setor: "Comércio atacadista de carnes, produtos da carne e pescado                   " },
+    { cnae: "46.35-4", grupo_risco: "2", setor: "Comércio atacadista de bebidas                   " },
+    { cnae: "46.36-2", grupo_risco: "2", setor: "Comércio atacadista de produtos do fumo                   " },
+    { cnae: "46.37-1", grupo_risco: "2", setor: "Comércio atacadista especializado em produtos  alimentícios não especificados anteriormente    " },
+    { cnae: "46.39-7", grupo_risco: "2", setor: "Comércio atacadista de produtos alimentícios em geral                   " },
+    { cnae: "46.41-9", grupo_risco: "2", setor: "Comércio atacadista de tecidos, artefatos de tecidos e de armarinho                   " },
+    { cnae: "46.42-7", grupo_risco: "2", setor: "Comércio atacadista de artigos do vestuário e acessórios                   " },
+    { cnae: "46.43-5", grupo_risco: "2", setor: "Comércio atacadista de calçados e artigos de viagem                   " },
+    { cnae: "46.44-3", grupo_risco: "2", setor: "Comércio atacadista de produtos farmacêuticos para uso humano e veterinário                   " },
+    { cnae: "46.45-1", grupo_risco: "2", setor: "Comércio atacadista de instrumentos e materiais para uso médico, cirúrgico, ortopédico e odontológico     " },
+    { cnae: "46.46-0", grupo_risco: "2", setor: "Comércio atacadista de cosméticos, produtos de perfumaria e de higiene pessoal                   " },
+    { cnae: "46.47-8", grupo_risco: "2", setor: "Comércio atacadista de artigos de escritório e de papelaria; livros, jornais e outras publicações                   " },
+    { cnae: "46.49-4", grupo_risco: "2", setor: "Comércio atacadista de equipamentos e artigos de uso pessoal e doméstico não especificados anteriormente   " },
+    { cnae: "46.51-6", grupo_risco: "3", setor: "Comércio atacadista de computadores, periféricos e suprimentos de informática                   " },
+    { cnae: "46.52-4", grupo_risco: "3", setor: "Comércio atacadista de componentes eletrônicos e equipamentos de telefonia e comunicação           " },
+    { cnae: "46.61-3", grupo_risco: "3", setor: "Comércio atacadista de máquinas, aparelhos e equipamentos para uso agropecuário; partes e peças" },
+    { cnae: "46.62-1", grupo_risco: "3", setor: "Comércio atacadista de máquinas, equipamentos para terraplenagem, mineração e construção; partes e peças" },
+    { cnae: "46.63-0", grupo_risco: "3", setor: "Comércio atacadista de máquinas e equipamentos para uso industrial; partes e peças                   " },
+    { cnae: "46.64-8", grupo_risco: "3", setor: "Comércio atacadista de máquinas, aparelhos e equipamentos para uso odonto-médico-hospitalar; partes e peças    " },
+    { cnae: "46.65-6", grupo_risco: "3", setor: "Comércio atacadista de máquinas e equipamentos para uso comercial; partes e peças                   " },
+    { cnae: "46.69-9", grupo_risco: "3", setor: "Comércio atacadista de máquinas, aparelhos e equipamentos não especificados anteriormente; partes e peças     " },
+    { cnae: "46.71-1", grupo_risco: "3", setor: "Comércio atacadista de madeira e produtos derivados                   " },
+    { cnae: "46.72-9", grupo_risco: "3", setor: "Comércio atacadista de ferragens e ferramentas                   " },
+    { cnae: "46.73-7", grupo_risco: "3", setor: "Comércio atacadista de material elétrico                   " },
+    { cnae: "46.74-5", grupo_risco: "3", setor: "Comércio atacadista de cimento                   " },
+    { cnae: "46.79-6", grupo_risco: "3", setor: "Comércio atacadista especializado de materiais de construção não especificados anteriormente e de materiais de construção em geral" },
+    { cnae: "46.81-8", grupo_risco: "3", setor: "Comércio atacadista de combustíveis sólidos, líquidos e gasosos, exceto gás natural e GLP" },
+    { cnae: "46.82-6", grupo_risco: "3", setor: "Comércio atacadista de gás liqüefeito de petróleo (GLP)" },
+    { cnae: "46.83-4", grupo_risco: "3", setor: "Comércio atacadista de defensivos agrícolas, adubos, fertilizantes e corretivos do solo" },
+    { cnae: "46.84-2", grupo_risco: "3", setor: "Comércio atacadista de produtos químicos e petroquímicos, exceto agroquímicos" },
+    { cnae: "46.85-1", grupo_risco: "3", setor: "Comércio atacadista de produtos siderúrgicos e metalúrgicos, exceto para construção" },
+    { cnae: "46.86-9", grupo_risco: "3", setor: "Comércio atacadista de papel e papelão em bruto e de embalagens" },
+    { cnae: "46.87-7", grupo_risco: "3", setor: "Comércio atacadista de resíduos e sucatas" },
+    { cnae: "46.89-3", grupo_risco: "3", setor: "Comércio atacadista especializado de outros produtos intermediários não especificados anteriormente" },
+    { cnae: "46.91-5", grupo_risco: "2", setor: "Comércio atacadista de mercadorias em geral, com predominância de produtos alimentícios" },
+    { cnae: "46.92-3", grupo_risco: "2", setor: "Comércio atacadista de mercadorias em geral, com predominância de insumos agropecuários" },
+    { cnae: "46.93-1", grupo_risco: "2", setor: "Comércio atacadista de mercadorias em geral, sem predominância de alimentos ou de insumos agropecuários" },
+    { cnae: "47.11-3", grupo_risco: "2", setor: "Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - hipermercados e supermercados" },
+    { cnae: "47.12-1", grupo_risco: "2", setor: "Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - minimercados, mercearias e armazéns" },
+    { cnae: "47.13-0", grupo_risco: "2", setor: "Comércio varejista de mercadorias em geral, sem predominância de produtos alimentícios" },
+    { cnae: "47.21-1", grupo_risco: "2", setor: "Comércio varejista de produtos de padaria, laticínio, doces, balas e semelhantes" },
+    { cnae: "47.22-9", grupo_risco: "3", setor: "Comércio varejista de carnes e pescados - açougues e peixarias" },
+    { cnae: "47.23-7", grupo_risco: "2", setor: "Comércio varejista de bebidas" },
+    { cnae: "47.24-5", grupo_risco: "2", setor: "Comércio varejista de hortifrutigranjeiros" },
+    { cnae: "47.29-6", grupo_risco: "2", setor: "Comércio varejista de produtos alimentícios em geral ou especializado em produtos alimentícios não especificados anteriormente; produtos do fumo" },
+    { cnae: "47.31-8", grupo_risco: "3", setor: "Comércio varejista de combustíveis para veículos automotores" },
+    { cnae: "47.32-6", grupo_risco: "3", setor: "Comércio varejista de lubrificantes" },
+    { cnae: "47.41-5", grupo_risco: "2", setor: "Comércio varejista de tintas e materiais para pintura" },
+    { cnae: "47.42-3", grupo_risco: "1", setor: "Comércio varejista de material elétrico" },
+    { cnae: "47.43-1", grupo_risco: "2", setor: "Comércio varejista de vidros" },
+    { cnae: "47.44-0", grupo_risco: "2", setor: "Comércio varejista de ferragens, madeira e materiais de construção" },
+    { cnae: "47.51-2", grupo_risco: "1", setor: "Comércio varejista especializado de equipamentos e suprimentos de informática" },
+    { cnae: "47.52-1", grupo_risco: "1", setor: "Comércio varejista especializado de equipamentos de telefonia e comunicação" },
+    { cnae: "47.53-9", grupo_risco: "1", setor: "Comércio varejista especializado de eletrodomésticos e equipamentos de áudio e vídeo" },
+    { cnae: "47.54-7", grupo_risco: "1", setor: "Comércio varejista especializado de móveis, colchoaria e artigos de iluminação" },
+    { cnae: "47.55-5", grupo_risco: "1", setor: "Comércio varejista especializado de tecidos e artigos de cama, mesa e banho" },
+    { cnae: "47.56-3", grupo_risco: "1", setor: "Comércio varejista especializado de instrumentos musicais e acessórios" },
+    { cnae: "47.57-1", grupo_risco: "1", setor: "Comércio varejista especializado de peças e acessórios para aparelhos eletroeletrônicos para uso doméstico, exceto informática e comunicação" },
+    { cnae: "47.59-8", grupo_risco: "1", setor: "Comércio varejista de artigos de uso doméstico não especificados anteriormente" },
+    { cnae: "47.61-0", grupo_risco: "1", setor: "Comércio varejista de livros, jornais, revistas e papelaria" },
+    { cnae: "47.62-8", grupo_risco: "1", setor: "Comércio varejista de discos, CDs, DVDs e fitas" },
+    { cnae: "47.63-6", grupo_risco: "1", setor: "Comércio varejista de artigos recreativos e esportivos" },
+    { cnae: "47.71-7", grupo_risco: "2", setor: "Comércio varejista de produtos farmacêuticos para uso humano e veterinário" },
+    { cnae: "47.72-5", grupo_risco: "1", setor: "Comércio varejista de cosméticos, produtos de perfumaria e de higiene pessoal" },
+    { cnae: "47.73-3", grupo_risco: "1", setor: "Comércio varejista de artigos médicos e ortopédicos" },
+    { cnae: "47.74-1", grupo_risco: "1", setor: "Comércio varejista de artigos de óptica" },
+    { cnae: "47.81-4", grupo_risco: "1", setor: "Comércio varejista de artigos do vestuário e acessórios" },
+    { cnae: "47.82-2", grupo_risco: "1", setor: "Comércio varejista de calçados e artigos de viagem" },
+    { cnae: "47.83-1", grupo_risco: "1", setor: "Comércio varejista de jóias e relógios" },
+    { cnae: "47.84-9", grupo_risco: "3", setor: "Comércio varejista de gás liqüefeito de petróleo (GLP)" },
+    { cnae: "47.85-7", grupo_risco: "2", setor: "Comércio varejista de artigos usados" },
+    { cnae: "47.89-0", grupo_risco: "1", setor: "Comércio varejista de outros produtos novos não especificados anteriormente" },
+    { cnae: "47.90-3", grupo_risco: "2", setor: "Comércio ambulante e outros tipos de comércio varejista" },
+    { cnae: "49.11-6", grupo_risco: "3", setor: "Transporte ferroviário de carga" },
+    { cnae: "49.12-4", grupo_risco: "3", setor: "Transporte metroferroviário de passageiros" },
+    { cnae: "49.21-3", grupo_risco: "3", setor: "Transporte rodoviário coletivo de passageiros, com itinerário fixo, municipal e em região metropolitana" },
+    { cnae: "49.22-1", grupo_risco: "3", setor: "Transporte rodoviário coletivo de passageiros, com itinerário fixo, intermunicipal, interestadual e internacional" },
+    { cnae: "49.23-0", grupo_risco: "3", setor: "Transporte rodoviário de táxi" },
+    { cnae: "49.24-8", grupo_risco: "3", setor: "Transporte escolar" },
+    { cnae: "49.29-9", grupo_risco: "3", setor: "Transporte rodoviário coletivo de passageiros, sob regime de fretamento, e outros transportes rodoviários não especificados anteriormente" },
+    { cnae: "49.30-2", grupo_risco: "3", setor: "Transporte rodoviário de carga" },
+    { cnae: "49.40-0", grupo_risco: "3", setor: "Transporte dutoviário" },
+    { cnae: "49.50-7", grupo_risco: "3", setor: "Trens turísticos, teleféricos e similares" },
+    { cnae: "50.11-4", grupo_risco: "3", setor: "Transporte marítimo de cabotagem" },
+    { cnae: "50.12-2", grupo_risco: "3", setor: "Transporte marítimo de longo curso" },
+    { cnae: "50.21-1", grupo_risco: "3", setor: "Transporte por navegação interior de carga" },
+    { cnae: "50.22-0", grupo_risco: "3", setor: "Transporte por navegação interior de passageiros em linhas regulares" },
+    { cnae: "50.30-1", grupo_risco: "3", setor: "Navegação de apoio" },
+    { cnae: "50.91-2", grupo_risco: "3", setor: "Transporte por navegação de travessia" },
+    { cnae: "50.99-8", grupo_risco: "3", setor: "Transportes aquaviários não especificados anteriormente" },
+    { cnae: "51.11-1", grupo_risco: "3", setor: "Transporte aéreo de passageiros regular" },
+    { cnae: "51.12-9", grupo_risco: "3", setor: "Transporte aéreo de passageiros não-regular" },
+    { cnae: "51.20-0", grupo_risco: "3", setor: "Transporte aéreo de carga" },
+    { cnae: "51.30-7", grupo_risco: "3", setor: "Transporte espacial" },
+    { cnae: "52.11-7", grupo_risco: "3", setor: "Armazenamento" },
+    { cnae: "52.12-5", grupo_risco: "3", setor: "Carga e descarga" },
+    { cnae: "52.21-4", grupo_risco: "3", setor: "Concessionárias de rodovias, pontes, túneis e serviços relacionados" },
+    { cnae: "52.22-2", grupo_risco: "3", setor: "Terminais rodoviários e ferroviários" },
+    { cnae: "52.23-1", grupo_risco: "3", setor: "Estacionamento de veículos" },
+    { cnae: "52.29-0", grupo_risco: "3", setor: "Atividades auxiliares dos transportes terrestres não especificadas anteriormente" },
+    { cnae: "52.31-1", grupo_risco: "3", setor: "Gestão de portos e terminais" },
+    { cnae: "52.32-0", grupo_risco: "3", setor: "Atividades de agenciamento marítimo" },
+    { cnae: "52.39-7", grupo_risco: "3", setor: "Atividades auxiliares dos transportes aquaviários não especificadas anteriormente" },
+    { cnae: "52.40-1", grupo_risco: "3", setor: "Atividades auxiliares dos transportes aéreos" },
+    { cnae: "52.50-8", grupo_risco: "3", setor: "Atividades relacionadas à organização do transporte de carga" },
+    { cnae: "53.10-5", grupo_risco: "2", setor: "Atividades de Correio" },
+    { cnae: "53.20-2", grupo_risco: "2", setor: "Atividades de malote e de entrega" },
+    { cnae: "55.10-8", grupo_risco: "2", setor: "Hotéis e similares" },
+    { cnae: "55.90-6", grupo_risco: "2", setor: "Outros tipos de alojamento não especificados anteriormente" },
+    { cnae: "56.11-2", grupo_risco: "2", setor: "Restaurantes e outros estabelecimentos de serviços de alimentação e bebidas" },
+    { cnae: "56.12-1", grupo_risco: "2", setor: "Serviços ambulantes de alimentação" },
+    { cnae: "56.20-1", grupo_risco: "2", setor: "Serviços de catering, bufê e outros serviços de comida preparada" },
+    { cnae: "58.11-5", grupo_risco: "3", setor: "Edição de livros" },
+    { cnae: "58.12-3", grupo_risco: "3", setor: "Edição de jornais" },
+    { cnae: "58.13-1", grupo_risco: "3", setor: "Edição de revistas" },
+    { cnae: "58.19-1", grupo_risco: "3", setor: "Edição de cadastros, listas e outros produtos gráficos" },
+    { cnae: "58.21-2", grupo_risco: "3", setor: "Edição integrada à impressão de livros" },
+    { cnae: "58.22-1", grupo_risco: "3", setor: "Edição integrada à impressão de jornais" },
+    { cnae: "58.23-9", grupo_risco: "3", setor: "Edição integrada à impressão de revistas" },
+    { cnae: "58.29-8", grupo_risco: "3", setor: "Edição integrada à impressão de cadastros, listas e outros produtos gráficos" },
+    { cnae: "59.11-1", grupo_risco: "2", setor: "Atividades de produção cinematográfica, de vídeos e de programas de televisão" },
+    { cnae: "59.12-0", grupo_risco: "2", setor: "Atividades de pós-produção cinematográfica, de vídeos e de programas de televisão" },
+    { cnae: "59.13-8", grupo_risco: "2", setor: "Distribuição cinematográfica, de vídeo e de programas de televisão" },
+    { cnae: "59.14-6", grupo_risco: "2", setor: "Atividades de exibição cinematográfica" },
+    { cnae: "59.20-1", grupo_risco: "2", setor: "Atividades de gravação de som e de edição de música" },
+    { cnae: "60.10-1", grupo_risco: "2", setor: "Atividades de rádio" },
+    { cnae: "60.21-7", grupo_risco: "2", setor: "Atividades de televisão aberta" },
+    { cnae: "60.22-5", grupo_risco: "2", setor: "Programadoras e atividades relacionadas à televisão por assinatura" },
+    { cnae: "61.10-8", grupo_risco: "2", setor: "Telecomunicações por fio" },
+    { cnae: "61.20-5", grupo_risco: "2", setor: "Telecomunicações sem fio" },
+    { cnae: "61.30-2", grupo_risco: "2", setor: "Telecomunicações por satélite" },
+    { cnae: "61.41-8", grupo_risco: "2", setor: "Operadoras de televisão por assinatura por cabo" },
+    { cnae: "61.42-6", grupo_risco: "2", setor: "Operadoras de televisão por assinatura por microondas" },
+    { cnae: "61.43-4", grupo_risco: "2", setor: "Operadoras de televisão por assinatura por satélite" },
+    { cnae: "61.90-6", grupo_risco: "2", setor: "Outras atividades de telecomunicações" },
+    { cnae: "62.01-5", grupo_risco: "2", setor: "Desenvolvimento de programas de computador sob encomenda" },
+    { cnae: "62.02-3", grupo_risco: "2", setor: "Desenvolvimento e licenciamento de programas de computador customizáveis" },
+    { cnae: "62.03-1", grupo_risco: "2", setor: "Desenvolvimento e licenciamento de programas de computador não-customizáveis" },
+    { cnae: "62.04-0", grupo_risco: "2", setor: "Consultoria em tecnologia da informação" },
+    { cnae: "62.09-1", grupo_risco: "2", setor: "Suporte técnico, manutenção e outros serviços em tecnologia da informação" },
+    { cnae: "63.11-9", grupo_risco: "2", setor: "Tratamento de dados, provedores de serviços de aplicação e serviços de hospedagem na internet" },
+    { cnae: "63.19-4", grupo_risco: "2", setor: "Portais, provedores de conteúdo e outros serviços de informação na internet" },
+    { cnae: "63.91-7", grupo_risco: "2", setor: "Agências de notícias" },
+    { cnae: "63.99-2", grupo_risco: "2", setor: "Outras atividades de prestação de serviços de informação não especificadas anteriormente" },
+    { cnae: "64.10-7", grupo_risco: "1", setor: "Banco Central" },
+    { cnae: "64.21-2", grupo_risco: "1", setor: "Bancos comerciais" },
+    { cnae: "64.22-1", grupo_risco: "1", setor: "Bancos múltiplos, com carteira comercial" },
+    { cnae: "64.23-9", grupo_risco: "1", setor: "Caixas econômicas" },
+    { cnae: "64.24-7", grupo_risco: "1", setor: "Crédito cooperativo" },
+    { cnae: "64.31-0", grupo_risco: "1", setor: "Bancos múltiplos, sem carteira comercial" },
+    { cnae: "64.32-8", grupo_risco: "1", setor: "Bancos de investimento" },
+    { cnae: "64.33-6", grupo_risco: "1", setor: "Bancos de desenvolvimento" },
+    { cnae: "64.34-4", grupo_risco: "1", setor: "Agências de fomento" },
+    { cnae: "64.35-2", grupo_risco: "1", setor: "Crédito imobiliário" },
+    { cnae: "64.36-1", grupo_risco: "1", setor: "Sociedades de crédito, financiamento e investimento - financeiras" },
+    { cnae: "64.37-9", grupo_risco: "1", setor: "Sociedades de crédito ao microempreendedor" },
+    { cnae: "64.38-7", grupo_risco: "1", setor: "Bancos de câmbio e outras instituições de intermediação não-monetária" },
+    { cnae: "64.40-9", grupo_risco: "1", setor: "Arrendamento mercantil" },
+    { cnae: "64.50-6", grupo_risco: "1", setor: "Sociedades de capitalização" },
+    { cnae: "64.61-1", grupo_risco: "1", setor: "Holdings de instituições financeiras" },
+    { cnae: "64.62-0", grupo_risco: "1", setor: "Holdings de instituições não-financeiras" },
+    { cnae: "64.63-8", grupo_risco: "1", setor: "Outras sociedades de participação, exceto holdings" },
+    { cnae: "64.70-1", grupo_risco: "1", setor: "Fundos de investimento" },
+    { cnae: "64.91-3", grupo_risco: "1", setor: "Sociedades de fomento mercantil - factoring" },
+    { cnae: "64.92-1", grupo_risco: "1", setor: "Securitização de créditos" },
+    { cnae: "64.93-0", grupo_risco: "1", setor: "Administração de consórcios para aquisição de bens e direitos" },
+    { cnae: "64.99-9", grupo_risco: "1", setor: "Outras atividades de serviços financeiros não especificadas anteriormente" },
+    { cnae: "65.11-1", grupo_risco: "1", setor: "Seguros de vida" },
+    { cnae: "65.12-0", grupo_risco: "1", setor: "Seguros não-vida" },
+    { cnae: "65.20-1", grupo_risco: "1", setor: "Seguros-saúde" },
+    { cnae: "65.30-8", grupo_risco: "1", setor: "Resseguros" },
+    { cnae: "65.41-3", grupo_risco: "1", setor: "Previdência complementar fechada" },
+    { cnae: "65.42-1", grupo_risco: "1", setor: "Previdência complementar aberta" },
+    { cnae: "65.50-2", grupo_risco: "1", setor: "Planos de saúde" },
+    { cnae: "66.11-8", grupo_risco: "1", setor: "Administração de bolsas e mercados de balcão organizados" },
+    { cnae: "66.12-6", grupo_risco: "1", setor: "Atividades de intermediários em transações de títulos, valores mobiliários e mercadorias" },
+    { cnae: "66.13-4", grupo_risco: "1", setor: "Administração de cartões de crédito" },
+    { cnae: "66.19-3", grupo_risco: "1", setor: "Atividades auxiliares dos serviços financeiros não especificadas anteriormente" },
+    { cnae: "66.21-5", grupo_risco: "1", setor: "Avaliação de riscos e perdas" },
+    { cnae: "66.22-3", grupo_risco: "1", setor: "Corretores e agentes de seguros, de planos de previdência complementar e de saúde" },
+    { cnae: "66.29-1", grupo_risco: "1", setor: "Atividades auxiliares dos seguros, da previdência complementar e dos planos de saúde não especificadas anteriormente" },
+    { cnae: "66.30-4", grupo_risco: "1", setor: "Atividades de administração de fundos por contrato ou comissão" },
+    { cnae: "68.10-2", grupo_risco: "1", setor: "Atividades imobiliárias de imóveis próprios" },
+    { cnae: "68.21-8", grupo_risco: "1", setor: "Intermediação na compra, venda e aluguel de imóveis" },
+    { cnae: "68.22-6", grupo_risco: "1", setor: "Gestão e administração da propriedade imobiliária" },
+    { cnae: "69.11-7", grupo_risco: "1", setor: "Atividades jurídicas, exceto cartórios" },
+    { cnae: "69.12-5", grupo_risco: "1", setor: "Cartórios" },
+    { cnae: "69.20-6", grupo_risco: "1", setor: "Atividades de contabilidade, consultoria e auditoria contábil e tributária" },
+    { cnae: "70.10-7", grupo_risco: "1", setor: "Sedes de empresas e unidades administrativas locais" },
+    { cnae: "70.20-4", grupo_risco: "1", setor: "Atividades de consultoria em gestão empresarial" },
+    { cnae: "71.11-1", grupo_risco: "1", setor: "Serviços de arquitetura" },
+    { cnae: "71.12-0", grupo_risco: "1", setor: "Serviços de engenharia" },
+    { cnae: "71.19-7", grupo_risco: "1", setor: "Atividades técnicas relacionadas à arquitetura e engenharia" },
+    { cnae: "71.20-1", grupo_risco: "2", setor: "Testes e análises técnicas" },
+    { cnae: "72.10-0", grupo_risco: "2", setor: "Pesquisa e desenvolvimento experimental em ciências físicas e naturais" },
+    { cnae: "72.20-7", grupo_risco: "2", setor: "Pesquisa e desenvolvimento experimental em ciências sociais e humanas" },
+    { cnae: "73.11-4", grupo_risco: "1", setor: "Agências de publicidade" },
+    { cnae: "73.12-2", grupo_risco: "1", setor: "Agenciamento de espaços para publicidade, exceto em veículos de comunicação" },
+    { cnae: "73.19-0", grupo_risco: "1", setor: "Atividades de publicidade não especificadas anteriormente" },
+    { cnae: "73.20-3", grupo_risco: "1", setor: "Pesquisas de mercado e de opinião pública" },
+    { cnae: "74.10-2", grupo_risco: "1", setor: "Design e decoração de interiores" },
+    { cnae: "74.20-0", grupo_risco: "2", setor: "Atividades fotográficas e similares" },
+    { cnae: "74.90-1", grupo_risco: "1", setor: "Atividades profissionais, científicas e técnicas não especificadas anteriormente" },
+    { cnae: "75.00-1", grupo_risco: "3", setor: "Atividades veterinárias" },
+    { cnae: "77.11-0", grupo_risco: "1", setor: "Locação de automóveis sem condutor" },
+    { cnae: "77.19-5", grupo_risco: "1", setor: "Locação de meios de transporte, exceto automóveis, sem condutor" },
+    { cnae: "77.21-7", grupo_risco: "1", setor: "Aluguel de equipamentos recreativos e esportivos" },
+    { cnae: "77.22-5", grupo_risco: "1", setor: "Aluguel de fitas de vídeo, DVDs e similares" },
+    { cnae: "77.23-3", grupo_risco: "1", setor: "Aluguel de objetos do vestuário, jóias e acessórios" },
+    { cnae: "77.29-2", grupo_risco: "1", setor: "Aluguel de objetos pessoais e domésticos não especificados anteriormente" },
+    { cnae: "77.31-4", grupo_risco: "1", setor: "Aluguel de máquinas e equipamentos agrícolas sem operador" },
+    { cnae: "77.32-2", grupo_risco: "1", setor: "Aluguel de máquinas e equipamentos para construção sem operador" },
+    { cnae: "77.33-1", grupo_risco: "1", setor: "Aluguel de máquinas e equipamentos para escritório" },
+    { cnae: "77.39-0", grupo_risco: "1", setor: "Aluguel de máquinas e equipamentos não especificados anteriormente" },
+    { cnae: "77.40-3", grupo_risco: "1", setor: "Gestão de ativos intangíveis não-financeiros" },
+    { cnae: "78.10-8", grupo_risco: "1", setor: "Seleção e agenciamento de mão-de-obra" },
+    { cnae: "78.20-5", grupo_risco: "1", setor: "Locação de mão-de-obra temporária" },
+    { cnae: "78.30-2", grupo_risco: "1", setor: "Fornecimento e gestão de recursos humanos para terceiros" },
+    { cnae: "79.11-2", grupo_risco: "1", setor: "Agências de viagens" },
+    { cnae: "79.12-1", grupo_risco: "1", setor: "Operadores turísticos" },
+    { cnae: "79.90-2", grupo_risco: "1", setor: "Serviços de reservas e outros serviços de turismo não especificados anteriormente" },
+    { cnae: "80.11-1", grupo_risco: "3", setor: "Atividades de vigilância e segurança privada" },
+    { cnae: "80.12-9", grupo_risco: "3", setor: "Atividades de transporte de valores" },
+    { cnae: "80.20-0", grupo_risco: "3", setor: "Atividades de monitoramento de sistemas de segurança" },
+    { cnae: "80.30-7", grupo_risco: "3", setor: "Atividades de investigação particular" },
+    { cnae: "81.11-7", grupo_risco: "2", setor: "Serviços combinados para apoio a edifícios, exceto condomínios prediais" },
+    { cnae: "81.12-5", grupo_risco: "2", setor: "Condomínios prediais" },
+    { cnae: "81.21-4", grupo_risco: "3", setor: "Limpeza em prédios e em domicílios" },
+    { cnae: "81.22-2", grupo_risco: "3", setor: "Imunização e controle de pragas urbanas" },
+    { cnae: "81.29-0", grupo_risco: "3", setor: "Atividades de limpeza não especificadas anteriormente" },
+    { cnae: "81.30-3", grupo_risco: "1", setor: "Atividades paisagísticas" },
+    { cnae: "82.11-3", grupo_risco: "1", setor: "Serviços combinados de escritório e apoio administrativo" },
+    { cnae: "82.19-9", grupo_risco: "2", setor: "Fotocópias, preparação de documentos e outros serviços especializados de apoio administrativo" },
+    { cnae: "82.20-2", grupo_risco: "2", setor: "Atividades de teleatendimento" },
+    { cnae: "82.30-0", grupo_risco: "2", setor: "Atividades de organização de eventos, exceto culturais e esportivos" },
+    { cnae: "82.91-1", grupo_risco: "2", setor: "Atividades de cobrança e informações cadastrais" },
+    { cnae: "82.92-0", grupo_risco: "2", setor: "Envasamento e empacotamento sob contrato" },
+    { cnae: "82.99-7", grupo_risco: "2", setor: "Atividades de serviços prestados principalmente às empresas não especificadas anteriormente" },
+    { cnae: "84.11-6", grupo_risco: "1", setor: "Administração pública em geral" },
+    { cnae: "84.12-4", grupo_risco: "1", setor: "Regulação das atividades de saúde, educação, serviços culturais e outros serviços sociais" },
+    { cnae: "84.13-2", grupo_risco: "1", setor: "Regulação das atividades econômicas" },
+    { cnae: "84.21-3", grupo_risco: "1", setor: "Relações exteriores" },
+    { cnae: "84.22-1", grupo_risco: "1", setor: "Defesa" },
+    { cnae: "84.23-0", grupo_risco: "1", setor: "Justiça" },
+    { cnae: "84.24-8", grupo_risco: "1", setor: "Segurança e ordem pública" },
+    { cnae: "84.25-6", grupo_risco: "1", setor: "Defesa Civil" },
+    { cnae: "84.30-2", grupo_risco: "1", setor: "Seguridade social obrigatória" },
+    { cnae: "85.11-2", grupo_risco: "2", setor: "Educação infantil - creche" },
+    { cnae: "85.12-1", grupo_risco: "2", setor: "Educação infantil - pré-escola" },
+    { cnae: "85.13-9", grupo_risco: "2", setor: "Ensino fundamental" },
+    { cnae: "85.20-1", grupo_risco: "2", setor: "Ensino médio" },
+    { cnae: "85.31-7", grupo_risco: "2", setor: "Educação superior - graduação" },
+    { cnae: "85.32-5", grupo_risco: "2", setor: "Educação superior - graduação e pós-graduação" },
+    { cnae: "85.33-3", grupo_risco: "2", setor: "Educação superior - pós-graduação e extensão" },
+    { cnae: "85.41-4", grupo_risco: "2", setor: "Educação profissional de nível técnico" },
+    { cnae: "85.42-2", grupo_risco: "2", setor: "Educação profissional de nível tecnológico" },
+    { cnae: "85.50-3", grupo_risco: "2", setor: "Atividades de apoio à educação" },
+    { cnae: "85.91-1", grupo_risco: "2", setor: "Ensino de esportes" },
+    { cnae: "85.92-9", grupo_risco: "2", setor: "Ensino de arte e cultura" },
+    { cnae: "85.93-7", grupo_risco: "2", setor: "Ensino de idiomas" },
+    { cnae: "85.99-6", grupo_risco: "2", setor: "Atividades de ensino não especificadas anteriormente" },
+    { cnae: "86.10-1", grupo_risco: "3", setor: "Atividades de atendimento hospitalar" },
+    { cnae: "86.21-6", grupo_risco: "3", setor: "Serviços móveis de atendimento a urgências" },
+    { cnae: "86.22-4", grupo_risco: "3", setor: "Serviços de remoção de pacientes, exceto os serviços móveis de atendimento a urgências" },
+    { cnae: "86.30-5", grupo_risco: "3", setor: "Atividades de atenção ambulatorial executadas por médicos e odontólogos" },
+    { cnae: "86.40-2", grupo_risco: "3", setor: "Atividades de serviços de complementação diagnóstica e terapêutica" },
+    { cnae: "86.50-0", grupo_risco: "2", setor: "Atividades de profissionais da área de saúde, exceto médicos e odontólogos" },
+    { cnae: "86.60-7", grupo_risco: "1", setor: "Atividades de apoio à gestão de saúde" },
+    { cnae: "86.90-9", grupo_risco: "1", setor: "Atividades de atenção à saúde humana não especificadas anteriormente" },
+    { cnae: "87.11-5", grupo_risco: "1", setor: "Atividades de assistência a idosos, deficientes físicos, imunodeprimidos e convalescentes prestadas em residências coletivas e particulares" },
+    { cnae: "87.12-3", grupo_risco: "1", setor: "Atividades de fornecimento de infra-estrutura de apoio e assistência a paciente no domicílio" },
+    { cnae: "87.20-4", grupo_risco: "1", setor: "Atividades de assistência psicossocial e à saúde a portadores de distúrbios psíquicos, deficiência mental e dependência química" },
+    { cnae: "87.3", grupo_risco: "1", setor: "Atividades de assistência social prestadas em residências coletivas e particulares" },
+    { cnae: "87.30-1", grupo_risco: "1", setor: "Atividades de assistência social prestadas em residências coletivas e particulares" },
+    { cnae: "88.00-6", grupo_risco: "1", setor: "Serviços de assistência social sem alojamento" },
+    { cnae: "90.01-9", grupo_risco: "2", setor: "Artes cênicas, espetáculos e atividades complementares" },
+    { cnae: "90.02-7", grupo_risco: "2", setor: "Criação artística" },
+    { cnae: "90.03-5", grupo_risco: "1", setor: "Gestão de espaços para artes cênicas, espetáculos e outras atividades artísticas" },
+    { cnae: "91.01-5", grupo_risco: "2", setor: "Atividades de bibliotecas e arquivos" },
+    { cnae: "91.02-3", grupo_risco: "2", setor: "Atividades de museus e de exploração, restauração artística e conservação de lugares e prédios históricos e atrações similares" },
+    { cnae: "91.03-1", grupo_risco: "2", setor: "Atividades de jardins botânicos, zoológicos, parques nacionais, reservas ecológicas e áreas de proteção ambiental" },
+    { cnae: "92.00-3", grupo_risco: "1", setor: "Atividades de exploração de jogos de azar e apostas" },
+    { cnae: "93.11-5", grupo_risco: "1", setor: "Gestão de instalações de esportes" },
+    { cnae: "93.12-3", grupo_risco: "2", setor: "Clubes sociais, esportivos e similares" },
+    { cnae: "93.13-1", grupo_risco: "2", setor: "Atividades de condicionamento físico" },
+    { cnae: "93.19-1", grupo_risco: "2", setor: "Atividades esportivas não especificadas anteriormente" },
+    { cnae: "93.21-2", grupo_risco: "2", setor: "Parques de diversão e parques temáticos" },
+    { cnae: "93.29-8", grupo_risco: "2", setor: "Atividades de recreação e lazer não especificadas anteriormente" },
+  
+  ];
+      // Tabela de dimensionamento da CIPA (corrigida)
+      const cipaTable = [
+      { min: 0, max: 19, 1: { efetivos: 0, suplentes: 0 }, 2: { efetivos: 0, suplentes: 0 }, 3: { efetivos: 0, suplentes: 0 }, 4: { efetivos: 0, suplentes: 0 } },
+      { min: 20, max: 29, 1: { efetivos: 0, suplentes: 0 }, 2: { efetivos: 0, suplentes: 0 }, 3: { efetivos: 1, suplentes: 1 }, 4: { efetivos: 1, suplentes: 1 } },
+      { min: 30, max: 50, 1: { efetivos: 0, suplentes: 0 }, 2: { efetivos: 1, suplentes: 1 }, 3: { efetivos: 2, suplentes: 1 }, 4: { efetivos: 3, suplentes: 2 } },
+      { min: 51, max: 80, 1: { efetivos: 1, suplentes: 1 }, 2: { efetivos: 1, suplentes: 1 }, 3: { efetivos: 2, suplentes: 1 }, 4: { efetivos: 3, suplentes: 2 } },
+      { min: 81, max: 100, 1: { efetivos: 1, suplentes: 1 }, 2: { efetivos: 1, suplentes: 1 }, 3: { efetivos: 2, suplentes: 1 }, 4: { efetivos: 4, suplentes: 2 } },
+      { min: 101, max: 120, 1: { efetivos: 1, suplentes: 1 }, 2: { efetivos: 2, suplentes: 1 }, 3: { efetivos: 3, suplentes: 2 }, 4: { efetivos: 4, suplentes: 2 } },
+      { min: 121, max: 140, 1: { efetivos: 1, suplentes: 1 }, 2: { efetivos: 3, suplentes: 2 }, 3: { efetivos: 4, suplentes: 2 }, 4: { efetivos: 4, suplentes: 3 } },
+      { min: 141, max: 300, 1: { efetivos: 2, suplentes: 2 }, 2: { efetivos: 4, suplentes: 3 }, 3: { efetivos: 5, suplentes: 4 }, 4: { efetivos: 5, suplentes: 4 } },
+      { min: 301, max: 500, 1: { efetivos: 4, suplentes: 3 }, 2: { efetivos: 5, suplentes: 4 }, 3: { efetivos: 6, suplentes: 4 }, 4: { efetivos: 6, suplentes: 5 } },
+      { min: 501, max: 1000, 1: { efetivos: 5, suplentes: 4 }, 2: { efetivos: 6, suplentes: 5 }, 3: { efetivos: 8, suplentes: 6 }, 4: { efetivos: 9, suplentes: 7 } },
+      { min: 1001, max: 2500, 1: { efetivos: 6, suplentes: 5 }, 2: { efetivos: 8, suplentes: 6 }, 3: { efetivos: 10, suplentes: 8 }, 4: { efetivos: 11, suplentes: 8 } },
+      { min: 2501, max: 5000, 1: { efetivos: 8, suplentes: 6 }, 2: { efetivos: 10, suplentes: 8 }, 3: { efetivos: 12, suplentes: 8 }, 4: { efetivos: 13, suplentes: 10 } },
+      { min: 5001, max: 10000, 1: { efetivos: 8, suplentes: 6 }, 2: { efetivos: 10, suplentes: 8 }, 3: { efetivos: 12, suplentes: 8 }, 4: { efetivos: 13, suplentes: 10 } },
+    ];
+
+    // Função para obter o número de colaboradores do localStorage
+    function getNumColaboradores() {
+      try {
+        const colaboradores = JSON.parse(localStorage.getItem('colaboradores')) || [];
+        if (!Array.isArray(colaboradores)) {
+          console.warn('Dados de colaboradores não são um array. Retornando 0.');
+          return 0;
+        }
+        return colaboradores.length;
+      } catch (e) {
+        console.error('Erro ao ler colaboradores do localStorage:', e);
+        return 0;
+      }
+    }
+
+    // Função para formatar o CNAE para o formato XX.XX-X
+    function formatCnaeToTable(inputCnae) {
+      const cleanCnae = inputCnae.replace(/[^\d-]/g, '');
+      if (!cleanCnae.match(/^\d{4}-?\d$/)) {
+        console.log(`CNAE inválido: ${cleanCnae}`);
+        return null;
+      }
+      const digits = cleanCnae.replace('-', '');
+      const formatted = `${digits.slice(0, 2)}.${digits.slice(2, 4)}-${digits.slice(4)}`;
+      console.log(`CNAE formatado: ${formatted}`);
+      return formatted;
+    }
+
+    // Função para validar o CNAE
+    function validateCnae(cnae) {
+      const formattedCnae = formatCnaeToTable(cnae);
+      if (!formattedCnae) return null;
+      const result = cnaeTable.find(item => item.cnae === formattedCnae);
+      console.log(`CNAE encontrado: ${result ? JSON.stringify(result) : 'Nenhum'}`);
+      return result;
+    }
+
+    // Função para calcular representantes da CIPA
+    function calculateCipa(numColaboradores, grupoRisco) {
+      if (!Number.isInteger(numColaboradores) || numColaboradores < 0) {
+        console.log(`Número de colaboradores inválido: ${numColaboradores}`);
+        return { efetivos: 0, suplentes: 0 };
+      }
+
+      const riscoNumber = grupoRisco.toLowerCase().replace('gr', '');
+      let faixa = cipaTable.find(f => numColaboradores >= f.min && numColaboradores <= f.max);
+      let efetivos = 0;
+      let suplentes = 0;
+
+      if (faixa) {
+        const data = faixa[riscoNumber];
+        if (!data) {
+          console.log(`Grau de risco inválido: ${riscoNumber}`);
+          return { efetivos: 0, suplentes: 0 };
+        }
+        efetivos = data.efetivos;
+        suplentes = data.suplentes;
+      } else if (numColaboradores > 10000) {
+        const baseFaixa = cipaTable.find(f => f.min === 5001);
+        const baseData = baseFaixa[riscoNumber];
+        efetivos = baseData.efetivos;
+        suplentes = baseData.suplentes;
+
+        const extraGroups = Math.floor((numColaboradores - 10000) / 2500);
+        const extraEfetivos = { 1: 1, 2: 1, 3: 2, 4: 2 }[riscoNumber];
+        const extraSuplentes = { 1: 1, 2: 1, 3: 2, 4: 2 }[riscoNumber];
+        efetivos += extraGroups * extraEfetivos;
+        suplentes += extraGroups * extraSuplentes;
+      } else {
+        console.log(`Faixa não encontrada para ${numColaboradores} colaboradores`);
+        return { efetivos: 0, suplentes: 0 };
+      }
+
+      console.log(`CIPA calculada: ${JSON.stringify({ efetivos, suplentes })}`);
+      return { efetivos, suplentes };
+    }
+
+    // Função para salvar os dados da empresa no localStorage (original)
+    function salvarDadosEmpresa(formData, logoBase64) {
+      const dados = {
+        logo: logoBase64,
+        nome: formData.nome,
+        endereco: formData.endereco,
+        cep: formData.cep,
+        telefone: formData.telefone,
+        cnpj: formData.cnpj,
+        cnae: formData.cnae,
+        grupoRisco: formData.grupoRisco,
+        setor: formData.setor,
+        numColaboradores: formData.numColaboradores,
+        efetivosEmpregados: formData.efetivosEmpregados,
+        suplentesEmpregados: formData.suplentesEmpregados,
+        efetivosEmpregador: formData.efetivosEmpregador,
+        suplentesEmpregador: formData.suplentesEmpregador,
+        totalCipa: formData.totalCipa,
+        repEmpresa: formData.repEmpresa,
+        repCipa: formData.repCipa,
+      };
+      try {
+        localStorage.setItem('empresa', JSON.stringify(dados));
+        console.log('Dados da empresa salvos:', dados);
+      } catch (e) {
+        console.error('Erro ao salvar dados da empresa:', e);
+        alert('Erro ao salvar os dados da empresa. Verifique o console para detalhes.');
+      }
+    }
+
+    // Nova função para salvar apenas os dados solicitados (Logotipo, Nome, Endereço, CNPJ, CNAE)
+    function salvarDadosBasicosEmpresa(formData, logoBase64) {
+      const dadosBasicos = {
+        logo: logoBase64,
+        nome: formData.nome,
+        endereco: formData.endereco,
+        cnpj: formData.cnpj,
+        cnae: formData.cnae,
+      };
+      try {
+        localStorage.setItem('empresa_basica', JSON.stringify(dadosBasicos));
+        console.log('Dados básicos da empresa salvos:', dadosBasicos);
+      } catch (e) {
+        console.error('Erro ao salvar dados básicos da empresa:', e);
+        alert('Erro ao salvar os dados básicos da empresa.');
+      }
+    }
+
+    // Função para carregar dados salvos do localStorage
+    function carregarDadosEmpresa() {
+      try {
+        const dados = JSON.parse(localStorage.getItem('empresa'));
+        if (dados) {
+          document.getElementById('nome').value = dados.nome || '';
+          document.getElementById('endereco').value = dados.endereco || '';
+          document.getElementById('cep').value = dados.cep || '';
+          document.getElementById('telefone').value = dados.telefone || '';
+          document.getElementById('cnpj').value = dados.cnpj || '';
+          document.getElementById('cnae').value = dados.cnae || '';
+          document.getElementById('grupoRisco').value = dados.grupoRisco || '';
+          document.getElementById('setor').value = dados.setor || '';
+          document.getElementById('numColaboradores').value = dados.numColaboradores || 0;
+          document.getElementById('efetivosEmpregados').textContent = dados.efetivosEmpregados || 0;
+          document.getElementById('suplentesEmpregados').textContent = dados.suplentesEmpregados || 0;
+          document.getElementById('efetivosEmpregador').textContent = dados.efetivosEmpregador || 0;
+          document.getElementById('suplentesEmpregador').textContent = dados.suplentesEmpregador || 0;
+          document.getElementById('totalCipa').textContent = dados.totalCipa || 0;
+          document.getElementById('repEmpresa').value = dados.repEmpresa || '';
+          document.getElementById('repCipa').value = dados.repCipa || '';
+          if (dados.logo) {
+            document.getElementById('logoPreview').src = dados.logo;
+            document.getElementById('logoPreview').style.display = 'block';
+          }
+        }
+      } catch (e) {
+        console.error('Erro ao carregar dados da empresa:', e);
+      }
+    }
+
+    // Função para atualizar os campos relacionados ao CNAE e número de colaboradores
+    function updateCipaFields() {
+      const cnae = document.getElementById('cnae').value;
+      const numColaboradores = getNumColaboradores();
+      const cnaeError = document.getElementById('cnaeError');
+      const numColaboradoresError = document.getElementById('numColaboradoresError');
+
+      // Atualizar o campo de número de colaboradores
+      document.getElementById('numColaboradores').value = numColaboradores;
+
+      // Validar número de colaboradores
+      if (numColaboradores < 0) {
+        numColaboradoresError.style.display = 'block';
+        document.getElementById('efetivosEmpregados').textContent = '0';
+        document.getElementById('suplentesEmpregados').textContent = '0';
+        document.getElementById('efetivosEmpregador').textContent = '0';
+        document.getElementById('suplentesEmpregador').textContent = '0';
+        document.getElementById('totalCipa').textContent = '0';
+        return;
+      } else {
+        numColaboradoresError.style.display = 'none';
+      }
+
+      // Validar CNAE
+      const cnaeData = validateCnae(cnae);
+      if (!cnaeData || cnae.replace(/[^\d]/g, '').length < 5) {
+        cnaeError.style.display = cnae.replace(/[^\d]/g, '').length >= 5 ? 'block' : 'none';
+        document.getElementById('grupoRisco').value = '';
+        document.getElementById('setor').value = '';
+        document.getElementById('efetivosEmpregados').textContent = '0';
+        document.getElementById('suplentesEmpregados').textContent = '0';
+        document.getElementById('efetivosEmpregador').textContent = '0';
+        document.getElementById('suplentesEmpregador').textContent = '0';
+        document.getElementById('totalCipa').textContent = '0';
+      } else {
+        cnaeError.style.display = 'none';
+        document.getElementById('grupoRisco').value = cnaeData.grupo_risco;
+        document.getElementById('setor').value = cnaeData.setor;
+
+        // Calcular representantes da CIPA
+        const cipaData = calculateCipa(numColaboradores, cnaeData.grupo_risco);
+        document.getElementById('efetivosEmpregados').textContent = cipaData.efetivos;
+        document.getElementById('suplentesEmpregados').textContent = cipaData.suplentes;
+        document.getElementById('efetivosEmpregador').textContent = cipaData.efetivos;
+        document.getElementById('suplentesEmpregador').textContent = cipaData.suplentes;
+        document.getElementById('totalCipa').textContent = (cipaData.efetivos + cipaData.suplentes) * 2;
+      }
+    }
+
+    // Máscaras de entrada
+    function applyMask(input, maskFunction) {
+      input.addEventListener('input', () => {
+        const value = maskFunction(input.value.replace(/\D/g, ''));
+        input.value = value;
+      });
+    }
+
+    applyMask(document.getElementById('cep'), value => {
+      if (value.length <= 5) return value;
+      return `${value.slice(0, 5)}-${value.slice(5, 8)}`;
+    });
+
+    applyMask(document.getElementById('telefone'), value => {
+      if (value.length <= 2) return value;
+      if (value.length <= 6) return `(${value.slice(0, 2)}) ${value.slice(2)}`;
+      if (value.length <= 10) return `(${value.slice(0, 2)}) ${value.slice(2, 6)}-${value.slice(6)}`;
+      return `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7, 11)}`;
+    });
+
+    applyMask(document.getElementById('cnpj'), value => {
+      if (value.length <= 2) return value;
+      if (value.length <= 5) return `${value.slice(0, 2)}.${value.slice(2)}`;
+      if (value.length <= 8) return `${value.slice(0, 2)}.${value.slice(2, 5)}.${value.slice(5)}`;
+      if (value.length <= 12) return `${value.slice(0, 2)}.${value.slice(2, 5)}.${value.slice(5, 8)}/${value.slice(8)}`;
+      return `${value.slice(0, 2)}.${value.slice(2, 5)}.${value.slice(5, 8)}/${value.slice(8, 12)}-${value.slice(12, 14)}`;
+    });
+
+    applyMask(document.getElementById('cnae'), value => {
+      if (value.length <= 2) return value;
+      if (value.length <= 4) return `${value.slice(0, 2)}.${value.slice(2)}`;
+      return `${value.slice(0, 2)}.${value.slice(2, 4)}-${value.slice(4, 5)}`;
+    });
+
+    // Validação em tempo real para o CNAE
+    document.getElementById('cnae').addEventListener('input', function() {
+      console.log(`CNAE digitado: ${this.value}`);
+      updateCipaFields();
+    });
+
+    // Pré-visualização do logotipo
+    document.getElementById('logo').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById('logoPreview');
+      const logoError = document.getElementById('logoError');
+      if (file && /\.(png|jpg|jpeg|gif)$/i.test(file.name)) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+        logoError.style.display = 'none';
+      } else {
+        preview.style.display = 'none';
+        logoError.style.display = 'block';
+      }
+    });
+
+    // Validação do formulário e salvamento
+    document.getElementById('empresaForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      let isValid = true;
+
+      // Validação do logotipo
+      const logoInput = document.getElementById('logo');
+      const logoError = document.getElementById('logoError');
+      const logoFile = logoInput.files[0];
+      if (!logoFile || !/\.(png|jpg|jpeg|gif)$/i.test(logoFile.name)) {
+        logoError.style.display = 'block';
+        isValid = false;
+      } else {
+        logoError.style.display = 'none';
+      }
+
+      // Validação do nome
+      const nome = document.getElementById('nome').value.trim();
+      const nomeError = document.getElementById('nomeError');
+      if (!nome) {
+        nomeError.style.display = 'block';
+        isValid = false;
+      } else {
+        nomeError.style.display = 'none';
+      }
+
+      // Validação do endereço
+      const endereco = document.getElementById('endereco').value.trim();
+      const enderecoError = document.getElementById('enderecoError');
+      if (!endereco) {
+        enderecoError.style.display = 'block';
+        isValid = false;
+      } else {
+        enderecoError.style.display = 'none';
+      }
+
+      // Validação do CEP
+      const cep = document.getElementById('cep').value;
+      const cepError = document.getElementById('cepError');
+      if (!/^\d{5}-\d{3}$/.test(cep)) {
+        cepError.style.display = 'block';
+        isValid = false;
+      } else {
+        cepError.style.display = 'none';
+      }
+
+      // Validação do telefone
+      const telefone = document.getElementById('telefone').value.trim();
+      const telefoneError = document.getElementById('telefoneError');
+      if (!/^\(\d{2}\)\s\d{4,5}-\d{4}$/.test(telefone)) {
+        telefoneError.style.display = 'block';
+        isValid = false;
+      } else {
+        telefoneError.style.display = 'none';
+      }
+
+      // Validação do CNPJ
+      const cnpj = document.getElementById('cnpj').value;
+      const cnpjError = document.getElementById('cnpjError');
+      if (!/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/.test(cnpj)) {
+        cnpjError.style.display = 'block';
+        isValid = false;
+      } else {
+        cnpjError.style.display = 'none';
+      }
+
+      // Validação do CNAE
+      const cnae = document.getElementById('cnae').value;
+      const cnaeError = document.getElementById('cnaeError');
+      const cnaeData = validateCnae(cnae);
+      if (!cnaeData) {
+        cnaeError.style.display = cnae.replace(/[^\d]/g, '').length >= 5 ? 'block' : 'none';
+        isValid = false;
+      } else {
+        cnaeError.style.display = 'none';
+      }
+
+      // Validação do número de colaboradores
+      const numColaboradores = getNumColaboradores();
+      const numColaboradoresError = document.getElementById('numColaboradoresError');
+      if (numColaboradores < 0) {
+        numColaboradoresError.style.display = 'block';
+        isValid = false;
+      } else {
+        numColaboradoresError.style.display = 'none';
+      }
+
+      // Validação do representante da empresa
+      const repEmpresa = document.getElementById('repEmpresa').value.trim();
+      const repEmpresaError = document.getElementById('repEmpresaError');
+      if (!repEmpresa) {
+        repEmpresaError.style.display = 'block';
+        isValid = false;
+      } else {
+        repEmpresaError.style.display = 'none';
+      }
+
+      // Validação do presidente da CIPA
+      const repCipa = document.getElementById('repCipa').value.trim();
+      const repCipaError = document.getElementById('repCipaError');
+      if (!repCipa) {
+        repCipaError.style.display = 'block';
+        isValid = false;
+      } else {
+        repCipaError.style.display = 'none';
+      }
+
+      if (isValid) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const logoBase64 = e.target.result;
+          const formData = {
+            nome,
+            endereco,
+            cep,
+            telefone,
+            cnpj,
+            cnae,
+            grupoRisco: document.getElementById('grupoRisco').value,
+            setor: document.getElementById('setor').value,
+            numColaboradores,
+            efetivosEmpregados: parseInt(document.getElementById('efetivosEmpregados').textContent),
+            suplentesEmpregados: parseInt(document.getElementById('suplentesEmpregados').textContent),
+            efetivosEmpregador: parseInt(document.getElementById('efetivosEmpregador').textContent),
+            suplentesEmpregador: parseInt(document.getElementById('suplentesEmpregador').textContent),
+            totalCipa: parseInt(document.getElementById('totalCipa').textContent),
+            repEmpresa,
+            repCipa,
+          };
+          salvarDadosEmpresa(formData, logoBase64);
+          salvarDadosBasicosEmpresa(formData, logoBase64); // Salvar os dados básicos solicitados
+          document.getElementById('empresaForm').reset();
+          document.getElementById('logoPreview').style.display = 'none';
+          updateCipaFields();
+          alert('Formulário enviado e dados salvos com sucesso!');
+          // Redirecionar para a outra tela (mantido do código original)
+          window.location.href = 'outra_tela.html';
+        };
+        reader.onerror = function() {
+          alert('Erro ao processar o logotipo. Tente novamente.');
+        };
+        reader.readAsDataURL(logoFile);
+      } else {
+        alert('Por favor, corrija os erros no formulário.');
+      }
+    });
+
+    // Função para navegação
+    function irPara(pagina) {
+      window.location.href = pagina;
+    }
+
+    // Carregar dados salvos e atualizar campos ao carregar a página
+    window.addEventListener('load', function() {
+      carregarDadosEmpresa();
+      updateCipaFields();
+    });
+  </script>
+</body>
+</html>

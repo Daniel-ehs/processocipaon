@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Passo 2 - Edital de Convocação para Eleição</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 4rem;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .logo-empresa {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin-right: 1rem;
+    }
+
+    .logo-placeholder {
+      width: 100px;
+      height: 100px;
+      background-color: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+      text-align: center;
+    }
+
+    .header-text {
+      flex: 1;
+    }
+
+    .titulo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: green;
+      margin: 0;
+    }
+
+    .gestao {
+      font-size: 1rem;
+      color: #555;
+      margin-top: 0.5rem;
+    }
+
+    .form-container {
+      margin-top: 76px;
+      text-align: center;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background-color: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button:hover {
+      background-color: #005a00;
+    }
+
+    .back-icon {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      font-size: 24px;
+      color: green;
+      cursor: pointer;
+      z-index: 1000;
+      transition: color 0.2s;
+    }
+
+    .back-icon:hover {
+      color: #005a00;
+    }
+
+    .preview {
+      border: 1px solid #e0e0e0;
+      padding: 1rem;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .preview-data {
+      text-align: right;
+      margin-top: 50px;
+      font-size: 1rem;
+      padding-right: 38px;
+    }
+
+    .signature {
+      margin-top: 150px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .signature div {
+      width: 48%;
+      text-align: center;
+    }
+
+    .signature-line {
+      border-bottom: 2px solid #000;
+      width: 200px;
+      margin: 0.5rem auto;
+      max-width: 100%;
+    }
+
+    .signature p {
+      margin: 0.5rem 0 0;
+      font-size: 0.9rem;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2000;
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      position: relative;
+      background-color: white;
+      width: 320px;
+      margin: 10% auto;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .modal-content h3 {
+      margin: 0 0 1rem;
+      font-size: 1.3rem;
+      color: #333;
+    }
+
+    .modal-content label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+      font-size: 0.95rem;
+      color: #333;
+      font-weight: 500;
+      text-align: left;
+    }
+
+    .modal-content input {
+      padding: 0.5rem;
+      font-size: 0.95rem;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+
+    .modal-content input:focus {
+      outline: none;
+      border-color: #28a745;
+    }
+
+    .modal-content input.error {
+      border-color: #dc3545;
+    }
+
+    .horario-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .horario-container input {
+      width: 70px;
+      text-align: center;
+    }
+
+    .horario-container span {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .modal-content button {
+      margin-top: 1rem;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-content button:hover {
+      filter: brightness(90%);
+    }
+
+    .modal-content button.confirm {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .modal-content button.cancel {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+      display: none;
+      text-align: left;
+    }
+
+    .error-message.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Ícone de Voltar Minimalista -->
+  <span id="back-icon" class="back-icon material-icons" onclick="irPara('ProcEleitoral.html')" title="Voltar ao Processo Eleitoral">arrow_back</span>
+
+  <!-- Modal para Entrada de Dados -->
+  <div class="modal" id="inputModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Informe os Detalhes da Eleição</h3>
+      <label for="modalHorarioInicio">Horário da Eleição</label>
+      <div class="horario-container">
+        <input type="text" id="modalHorarioInicio" placeholder="hh:mm" maxlength="5">
+        <span>às</span>
+        <input type="text" id="modalHorarioFim" placeholder="hh:mm" maxlength="5">
+      </div>
+      <div id="modalHorarioError" class="error-message">Por favor, informe horários válidos (ex.: 08:00 às 17:00).</div>
+      <label for="modalLocal">Local da Eleição</label>
+      <input type="text" id="modalLocal" placeholder="Ex.: Sala de Treinamento">
+      <div id="modalLocalError" class="error-message">Por favor, informe o local.</div>
+      <button class="confirm" onclick="submitModal()"><span class="material-icons">check</span> Confirmar</button>
+      <button class="cancel" onclick="closeModal()"><span class="material-icons">close</span> Cancelar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <img id="logo-empresa" class="logo-empresa" style="display: none;" alt="Logo da Empresa">
+      <div id="logo-placeholder" class="logo-placeholder">Logo da Empresa</div>
+      <div class="header-text">
+        <div class="titulo">Edital de Convocação para Eleição</div>
+        <div class="gestao" id="gestaoText">CIPA Gestão [Ano] / [Ano + 1]</div>
+      </div>
+    </div>
+
+    <div class="preview" id="previewText" style="display: none;">[Carregando texto do edital...]</div>
+    <div class="preview-data" id="previewData" style="display: none;"></div>
+
+    <div class="signature" id="signatureSection" style="display: none;">
+      <div>
+        <div class="signature-line"></div>
+        <p>Representante da Empresa</p>
+      </div>
+      <div>
+        <div class="signature-line"></div>
+        <p>Presidente da CIPA em Curso</p>
+      </div>
+    </div>
+
+    <div class="form-container" id="generateButton" style="display: none;">
+      <button onclick="gerarDocumento()"><span class="material-icons">file_download</span> Gerar Documento Word</button>
+    </div>
+  </div>
+
+  <script>
+    console.log("Iniciando carregamento de Pagina2.html...");
+    if (typeof docx === 'undefined') {
+      console.warn("Biblioteca docx.js não carregada inicialmente.");
+    } else {
+      console.log("Biblioteca docx.js carregada com sucesso.");
+    }
+
+    let formData = { horario: '', local: '' };
+
+    function irPara(pagina) {
+      console.log("Redirecionando para:", pagina);
+      window.location.href = pagina;
+    }
+
+    function getDataFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      console.log("Parâmetros da URL:", params.toString());
+      return {
+        data: params.get('data')
+      };
+    }
+
+    function getDataPosse() {
+      try {
+        const dataPosse = localStorage.getItem('dataPosse');
+        console.log("Data de posse carregada:", dataPosse);
+        return dataPosse;
+      } catch (e) {
+        console.error("Erro ao carregar data de posse:", e);
+        return null;
+      }
+    }
+
+    function calcularDatas(dataPosse) {
+      if (!dataPosse) {
+        return { dataEleicao: null, dataConvocacao: null, inscricaoInicio: null, inscricaoFim: null };
+      }
+
+      const dataBase = new Date(dataPosse);
+      dataBase.setFullYear(dataBase.getFullYear() + 1);
+
+      // Data da eleição (30 dias antes, conforme linha 7 do calendário)
+      let dataEleicao = new Date(dataBase);
+      dataEleicao.setDate(dataEleicao.getDate() - 30);
+      while (dataEleicao.getDay() === 0 || dataEleicao.getDay() === 6) {
+        dataEleicao.setDate(dataEleicao.getDate() - 1);
+      }
+
+      // Data da convocação (60 dias antes, conforme linha 2 do calendário)
+      let dataConvocacao = new Date(dataBase);
+      dataConvocacao.setDate(dataConvocacao.getDate() - 60);
+      while (dataConvocacao.getDay() === 0 || dataConvocacao.getDay() === 6) {
+        dataConvocacao.setDate(dataConvocacao.getDate() - 1);
+      }
+
+      // Início das inscrições (50 dias antes)
+      let inscricaoInicio = new Date(dataBase);
+      inscricaoInicio.setDate(inscricaoInicio.getDate() - 50);
+      while (inscricaoInicio.getDay() === 0 || inscricaoInicio.getDay() === 6) {
+        inscricaoInicio.setDate(inscricaoInicio.getDate() - 1);
+      }
+
+      // Fim das inscrições (35 dias antes)
+      let inscricaoFim = new Date(dataBase);
+      inscricaoFim.setDate(inscricaoFim.getDate() - 35);
+      while (inscricaoFim.getDay() === 0 || inscricaoFim.getDay() === 6) {
+        inscricaoFim.setDate(inscricaoFim.getDate() - 1);
+      }
+
+      return {
+        dataEleicao: dataEleicao.toISOString().split('T')[0],
+        dataConvocacao: dataConvocacao.toISOString().split('T')[0],
+        inscricaoInicio: inscricaoInicio.toISOString().split('T')[0],
+        inscricaoFim: inscricaoFim.toISOString().split('T')[0]
+      };
+    }
+
+    function formatarData(data) {
+      const dia = data.getDate().toString().padStart(2, '0');
+      const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+      const ano = data.getFullYear();
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    function formatarDataLonga(data) {
+      const meses = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      ];
+      const dia = data.getDate().toString().padStart(2, '0');
+      const mes = meses[data.getMonth()];
+      const ano = data.getFullYear();
+      return `${dia} de ${mes} de ${ano}`;
+    }
+
+    function loadEmpresaData() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa_basica')) || {};
+        console.log("Dados da empresa carregados de 'empresa_basica':", empresaData);
+        return {
+          nome: empresaData.nome || '',
+          cnpj: empresaData.cnpj || '',
+          cnae: empresaData.cnae || '',
+          endereco: empresaData.endereco || '',
+          logo: empresaData.logo || ''
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados da empresa:", e);
+        return {
+          nome: '',
+          cnpj: '',
+          cnae: '',
+          endereco: '',
+          logo: ''
+        };
+      }
+    }
+
+    function loadAssinaturaData() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa')) || {};
+        console.log("Dados de assinatura carregados de 'empresa':", empresaData);
+        return {
+          repEmpresa: empresaData.repEmpresa || 'Não informado',
+          repCipa: empresaData.repCipa || 'Não informado'
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados de assinatura:", e);
+        return {
+          repEmpresa: 'Não informado',
+          repCipa: 'Não informado'
+        };
+      }
+    }
+
+    // Função para aplicar máscara de horário (hh:mm)
+    function aplicarMascaraHorario(input) {
+      input.addEventListener('input', () => {
+        let value = input.value.replace(/\D/g, '');
+        if (value.length > 4) value = value.slice(0, 4);
+        if (value.length >= 3) {
+          value = value.slice(0, 2) + ':' + value.slice(2);
+        }
+        input.value = value;
+      });
+    }
+
+    // Função para validar horário (hh:mm)
+    function validarHorario(horario) {
+      if (!horario) return false;
+      const regex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+      return regex.test(horario);
+    }
+
+    // Aplicar máscara e validação em tempo real
+    function inicializarMascaraHorario() {
+      const inicioInput = document.getElementById('modalHorarioInicio');
+      const fimInput = document.getElementById('modalHorarioFim');
+      if (inicioInput && fimInput) {
+        aplicarMascaraHorario(inicioInput);
+        aplicarMascaraHorario(fimInput);
+
+        // Validação em tempo real ao sair do campo
+        [inicioInput, fimInput].forEach(input => {
+          input.addEventListener('blur', () => {
+            if (input.value && !validarHorario(input.value)) {
+              input.classList.add('error');
+              document.getElementById('modalHorarioError').classList.add('active');
+            } else {
+              input.classList.remove('error');
+              // Só limpar erro se ambos os campos estiverem válidos
+              if (validarHorario(inicioInput.value) && validarHorario(fimInput.value)) {
+                document.getElementById('modalHorarioError').classList.remove('active');
+              }
+            }
+          });
+        });
+      }
+    }
+
+    function showModal() {
+      document.getElementById('inputModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('inputModal').style.display = 'none';
+      document.getElementById('previewText').textContent = "Por favor, informe o horário e o local para continuar.";
+      document.getElementById('previewText').style.display = 'block';
+    }
+
+    function submitModal() {
+      const horarioInicio = document.getElementById('modalHorarioInicio').value.trim();
+      const horarioFim = document.getElementById('modalHorarioFim').value.trim();
+      const local = document.getElementById('modalLocal').value.trim();
+      const horarioError = document.getElementById('modalHorarioError');
+      const localError = document.getElementById('modalLocalError');
+      let isValid = true;
+
+      // Validação do horário
+      if (!horarioInicio || !horarioFim || !validarHorario(horarioInicio) || !validarHorario(horarioFim)) {
+        horarioError.textContent = "Por favor, informe horários válidos (ex.: 08:00 às 17:00).";
+        horarioError.classList.add('active');
+        if (!validarHorario(horarioInicio)) document.getElementById('modalHorarioInicio').classList.add('error');
+        if (!validarHorario(horarioFim)) document.getElementById('modalHorarioFim').classList.add('error');
+        isValid = false;
+      } else {
+        // Validar se horário de fim é posterior ao de início
+        const [inicioHoras, inicioMinutos] = horarioInicio.split(':').map(Number);
+        const [fimHoras, fimMinutos] = horarioFim.split(':').map(Number);
+        const inicioTotal = inicioHoras * 60 + inicioMinutos;
+        const fimTotal = fimHoras * 60 + fimMinutos;
+
+        if (fimTotal <= inicioTotal) {
+          horarioError.textContent = "O horário de fim deve ser posterior ao de início.";
+          horarioError.classList.add('active');
+          document.getElementById('modalHorarioFim').classList.add('error');
+          isValid = false;
+        } else {
+          horarioError.classList.remove('active');
+          document.getElementById('modalHorarioInicio').classList.remove('error');
+          document.getElementById('modalHorarioFim').classList.remove('error');
+        }
+      }
+
+      // Validação do local
+      if (!local) {
+        localError.classList.add('active');
+        document.getElementById('modalLocal').classList.add('error');
+        isValid = false;
+      } else {
+        localError.classList.remove('active');
+        document.getElementById('modalLocal').classList.remove('error');
+      }
+
+      if (isValid) {
+        formData = { horario: `${horarioInicio} às ${horarioFim}`, local };
+        document.getElementById('inputModal').style.display = 'none';
+        atualizarTextos();
+        document.getElementById('previewText').style.display = 'block';
+        document.getElementById('previewData').style.display = 'block';
+        document.getElementById('signatureSection').style.display = 'flex';
+        document.getElementById('generateButton').style.display = 'block';
+      }
+    }
+
+    function atualizarTextos() {
+      const { data: dataUrl } = getDataFromUrl();
+      const dataPosse = getDataPosse();
+      const { dataEleicao, dataConvocacao, inscricaoInicio, inscricaoFim } = calcularDatas(dataPosse);
+      const empresaData = loadEmpresaData();
+      console.log("Dados recebidos:", { dataUrl, dataPosse, dataEleicao, dataConvocacao, inscricaoInicio, inscricaoFim, empresaData, formData });
+
+      if (!dataPosse || !dataEleicao || !dataConvocacao || !inscricaoInicio || !inscricaoFim) {
+        document.getElementById('previewText').textContent = "Erro: Dados incompletos (falta data de posse ou datas calculadas). Volte ao calendário e insira uma data de posse válida.";
+        document.getElementById('previewData').textContent = "";
+        console.error("Erro: Dados incompletos:", { dataPosse, dataEleicao, dataConvocacao, inscricaoInicio, inscricaoFim });
+        return;
+      }
+
+      const data = new Date(dataEleicao);
+      const dataConvocacaoObj = new Date(dataConvocacao);
+      const dataInicio = new Date(inscricaoInicio);
+      const dataFim = new Date(inscricaoFim);
+      if (isNaN(data.getTime()) || isNaN(dataConvocacaoObj.getTime()) || isNaN(dataInicio.getTime()) || isNaN(dataFim.getTime())) {
+        document.getElementById('previewText').textContent = "Erro: Uma ou mais datas calculadas são inválidas.";
+        document.getElementById('previewData').textContent = "";
+        console.error("Erro: Datas inválidas:", { dataEleicao, dataConvocacao, inscricaoInicio, inscricaoFim });
+        return;
+      }
+
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        document.getElementById('previewText').textContent = `Erro: Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`;
+        document.getElementById('previewData').textContent = "";
+        console.error("Erro: Dados da empresa incompletos:", missingFields);
+        return;
+      }
+
+      const logoImg = document.getElementById('logo-empresa');
+      const logoPlaceholder = document.getElementById('logo-placeholder');
+      if (empresaData.logo) {
+        logoImg.src = empresaData.logo;
+        logoImg.style.display = 'block';
+        logoPlaceholder.style.display = 'none';
+        console.log("Logotipo carregado com sucesso.");
+      } else {
+        logoImg.style.display = 'none';
+        logoPlaceholder.style.display = 'flex';
+        console.log("Nenhum logotipo encontrado, exibindo placeholder.");
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      document.getElementById('gestaoText').textContent = `CIPA Gestão ${anoInicio} / ${anoFim}`;
+
+      const dataFormatada = formatarData(data);
+      const inscricaoInicioFormatada = formatarData(dataInicio);
+      const inscricaoFimFormatada = formatarData(dataFim);
+      const dataLongaFormatada = formatarDataLonga(dataConvocacaoObj);
+
+      const texto = `A Empresa ${empresaData.nome} comunica a todos os colaboradores que está aberto o processo eleitoral para a escolha dos representantes da Comissão Interna de Prevenção de Acidentes e de Assédio (CIPA), Gestão ${anoInicio}/${anoFim}, em conformidade com a Norma Regulamentadora nº 5 (NR-5), aprovada pela Portaria nº 3.214, de 8 de junho de 1978, atualizada pelas Portarias nº 8, de 23 de fevereiro de 1999, e nº 4.219, de 20 de dezembro de 2022.\n\n` +
+        `A eleição ocorrerá no seguinte dia, horário e local:\n\n` +
+        `Dia: ${dataFormatada}\n` +
+        `Horário: das ${formData.horario} horas\n` +
+        `Local: ${formData.local}\n\n` +
+        `O período de inscrições para candidatos ocorrerá de ${inscricaoInicioFormatada} a ${inscricaoFimFormatada}. Os interessados deverão procurar o Departamento de Segurança do Trabalho para retirar e preencher o formulário de inscrição.\n\n` +
+        `Todos os colaboradores efetivos têm o direito de se candidatar, conforme as disposições da NR-5. O voto será secreto e a participação de todos é fundamental para o fortalecimento das ações de segurança e saúde no ambiente de trabalho.\n\n` +
+        `Em caso de dúvidas, os colaboradores deverão procurar seu líder imediato ou o Departamento de Segurança do Trabalho.\n\n` +
+        `Participe! Sua colaboração é essencial para a construção de um ambiente de trabalho mais seguro e saudável para todos.`;
+
+      document.getElementById('previewText').textContent = texto;
+      document.getElementById('previewData').textContent = dataLongaFormatada;
+      console.log("Texto, data e logotipo atualizados com sucesso.");
+    }
+
+    // Inicializar máscara ao carregar a página
+    window.onload = () => {
+      console.log("Carregando Pagina2.html...");
+      showModal();
+      inicializarMascaraHorario();
+    };
+
+    function gerarDocumento() {
+      console.log("Iniciando geração do documento Word...");
+      if (typeof docx === 'undefined') {
+        console.error("Erro: Biblioteca docx.js não carregada.");
+        alert("Erro: Não foi possível carregar a biblioteca para gerar o documento. Verifique sua conexão à internet, tente outro navegador ou contate o suporte.");
+        return;
+      }
+
+      const { data: dataUrl } = getDataFromUrl();
+      const dataPosse = getDataPosse();
+      const { dataEleicao, dataConvocacao, inscricaoInicio, inscricaoFim } = calcularDatas(dataPosse);
+      const empresaData = loadEmpresaData();
+      const assinaturaData = loadAssinaturaData();
+
+      if (!dataPosse || !dataEleicao || !dataConvocacao || !inscricaoInicio || !inscricaoFim) {
+        console.error("Erro ao gerar documento: Dados incompletos.");
+        alert("Dados incompletos (falta data de posse ou datas calculadas). Volte ao calendário e insira uma data de posse válida.");
+        return;
+      }
+
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        console.error("Erro ao gerar documento: Dados da empresa incompletos:", missingFields);
+        alert(`Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`);
+        return;
+      }
+
+      if (!formData.horario || !formData.local) {
+        console.error("Erro ao gerar documento: Horário ou local não fornecidos.");
+        alert("Por favor, preencha o horário e o local da eleição.");
+        return;
+      }
+
+      const data = new Date(dataEleicao);
+      const dataConvocacaoObj = new Date(dataConvocacao);
+      const dataInicio = new Date(inscricaoInicio);
+      const dataFim = new Date(inscricaoFim);
+      if (isNaN(data.getTime()) || isNaN(dataConvocacaoObj.getTime()) || isNaN(dataInicio.getTime()) || isNaN(dataFim.getTime())) {
+        console.error("Erro ao gerar documento: Datas inválidas:", { dataEleicao, dataConvocacao, inscricaoInicio, inscricaoFim });
+        alert("Uma ou mais datas fornecidas são inválidas.");
+        return;
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      const dataFormatada = formatarData(data);
+      const inscricaoInicioFormatada = formatarData(dataInicio);
+      const inscricaoFimFormatada = formatarData(dataFim);
+      const dataLongaFormatada = formatarDataLonga(dataConvocacaoObj);
+
+      try {
+        function base64ToArrayBuffer(base64) {
+          const binaryString = window.atob(base64.split(',')[1]);
+          const len = binaryString.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          return bytes.buffer;
+        }
+
+        const invisibleBorders = {
+          top: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          bottom: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          left: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          right: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" }
+        };
+
+        const headerChildren = [
+          new docx.Table({
+            rows: [
+              new docx.TableRow({
+                children: [
+                  new docx.TableCell({
+                    width: { size: 1000, type: docx.WidthType.DXA },
+                    children: empresaData.logo ? [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.ImageRun({
+                            data: base64ToArrayBuffer(empresaData.logo),
+                            transformation: { width: 50, height: 50 }
+                          })
+                        ],
+                        alignment: docx.AlignmentType.LEFT
+                      })
+                    ] : [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: "Logo da Empresa",
+                            size: 12,
+                            font: "Arial",
+                            color: "555555"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.LEFT
+                      })
+                    ],
+                    borders: invisibleBorders
+                  }),
+                  new docx.TableCell({
+                    width: { size: 8000, type: docx.WidthType.DXA },
+                    children: [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: "Edital de Convocação para Eleição",
+                            bold: true,
+                            size: 36,
+                            font: "Arial",
+                            color: "008000"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.CENTER
+                      }),
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: `CIPA Gestão ${anoInicio} / ${anoFim}`,
+                            size: 20,
+                            font: "Arial",
+                            color: "555555"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.CENTER,
+                        spacing: { after: 200 }
+                      })
+                    ],
+                    borders: invisibleBorders
+                  })
+                ]
+              })
+            ],
+            width: { size: 100, type: docx.WidthType.PERCENTAGE }
+          })
+        ];
+
+        const doc = new docx.Document({
+          sections: [{
+            headers: {
+              default: new docx.Header({
+                children: headerChildren
+              })
+            },
+            properties: {},
+            children: [
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `A Empresa ${empresaData.nome} comunica a todos os colaboradores que está aberto o processo eleitoral para a escolha dos representantes da Comissão Interna de Prevenção de Acidentes e de Assédio (CIPA), Gestão ${anoInicio}/${anoFim}, em conformidade com a Norma Regulamentadora nº 5 (NR-5), aprovada pela Portaria nº 3.214, de 8 de junho de 1978, atualizada pelas Portarias nº 8, de 23 de fevereiro de 1999, e nº 4.219, de 20 de dezembro de 2022.`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { before: 720, after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `A eleição ocorrerá no seguinte dia, horário e local:`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `Dia: `,
+                    bold: true,
+                    size: 24,
+                    font: "Arial"
+                  }),
+                  new docx.TextRun({
+                    text: `${dataFormatada}`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 100 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `Horário: `,
+                    bold: true,
+                    size: 24,
+                    font: "Arial"
+                  }),
+                  new docx.TextRun({
+                    text: `das ${formData.horario} horas`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 100 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `Local: `,
+                    bold: true,
+                    size: 24,
+                    font: "Arial"
+                  }),
+                  new docx.TextRun({
+                    text: `${formData.local}`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `O período de inscrições para candidatos ocorrerá de ${inscricaoInicioFormatada} a ${inscricaoFimFormatada}. Os interessados deverão procurar o Departamento de Segurança do Trabalho para retirar e preencher o formulário de inscrição.`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `Todos os colaboradores efetivos têm o direito de se candidatar, conforme as disposições da NR-5. O voto será secreto e a participação de todos é fundamental para o fortalecimento das ações de segurança e saúde no ambiente de trabalho.`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `Em caso de dúvidas, os colaboradores deverão procurar seu líder imediato ou o Departamento de Segurança do Trabalho.`,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                spacing: { after: 200 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: `Participe! Sua colaboração é essencial para a construção de um ambiente de trabalho mais seguro e saudável para todos.`,
+                    size: 24,
+                    font: "Arial",
+                    bold: true
+                  })
+                ],
+                spacing: { after: 400 }
+              }),
+              new docx.Paragraph({
+                children: [
+                  new docx.TextRun({
+                    text: dataLongaFormatada,
+                    size: 24,
+                    font: "Arial"
+                  })
+                ],
+                alignment: docx.AlignmentType.RIGHT,
+                indent: { right: 567 },
+                spacing: { before: 1440, after: 1920 }
+              }),
+              new docx.Table({
+                rows: [
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 50, type: docx.WidthType.PERCENTAGE },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "____________________",
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 100 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: assinaturaData.repEmpresa,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 100 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Representante da Empresa",
+                                size: 20,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER
+                          })
+                        ],
+                        borders: invisibleBorders
+                      }),
+                      new docx.TableCell({
+                        width: { size: 50, type: docx.WidthType.PERCENTAGE },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "____________________",
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 100 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: assinaturaData.repCipa,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: { after: 100 }
+                          }),
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Presidente da CIPA em Curso",
+                                size: 20,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER
+                          })
+                        ],
+                        borders: invisibleBorders
+                      })
+                    ]
+                  })
+                ],
+                width: { size: 100, type: docx.WidthType.PERCENTAGE }
+              })
+            ]
+          }]
+        });
+
+        docx.Packer.toBlob(doc).then(blob => {
+          console.log("Documento Word gerado com sucesso.");
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "Edital_Convocacao.docx";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }).catch(error => {
+          console.error("Erro ao gerar o documento Word:", error);
+          alert("Erro ao gerar o documento. Verifique o console para detalhes.");
+        });
+      } catch (error) {
+        console.error("Erro ao criar o documento:", error);
+        alert("Erro ao criar o documento. Verifique o console para detalhes.");
+      }
+    }
+  </script>
+</body>
+</html>
