@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Eleição da CIPA</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 4rem;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .logo-empresa {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin-right: 1rem;
+    }
+    .logo-placeholder {
+      width: 100px;
+      height: 100px;
+      background-color: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+      text-align: center;
+    }
+    .header-text {
+      flex: 1;
+    }
+    .titulo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #28a745;
+      margin: 0;
+    }
+    .gestao {
+      font-size: 1rem;
+      color: #555;
+      margin-top: 0.5rem;
+    }
+    .form-container {
+      margin-top: 2rem;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    button:hover {
+      background-color: #005a00;
+    }
+    .back-icon {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      font-size: 24px;
+      color: #28a745;
+      cursor: pointer;
+      z-index: 1000;
+      transition: color 0.2s;
+    }
+    .back-icon:hover {
+      color: #005a00;
+    }
+    .preview {
+      border: 1px solid #e0e0e0;
+      padding: 1rem;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2000;
+    }
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-content {
+      position: relative;
+      background-color: white;
+      width: 320px;
+      margin: 10% auto;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+    .modal-content h3 {
+      margin: 0 0 1rem;
+      font-size: 1.3rem;
+      color: #333;
+    }
+    .modal-content label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+      font-size: 0.95rem;
+      color: #333;
+      font-weight: 500;
+      text-align: left;
+    }
+    .modal-content input {
+      padding: 0.5rem;
+      font-size: 0.95rem;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+    .modal-content input:focus {
+      outline: none;
+      border-color: #28a745;
+    }
+    .modal-content input.error {
+      border-color: #dc3545;
+    }
+    .horario-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .horario-container input {
+      width: 70px;
+      text-align: center;
+    }
+    .modal-content button {
+      margin-top: 1rem;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .modal-content button:hover {
+      filter: brightness(90%);
+    }
+    .modal-content button.confirm {
+      background-color: #28a745;
+      color: white;
+    }
+    .modal-content button.cancel {
+      background-color: #6c757d;
+      color: white;
+    }
+    .error-message {
+      color: #dc3545;
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+      display: none;
+      text-align: left;
+    }
+    .error-message.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Ícone de Voltar -->
+  <span id="back-icon" class="back-icon material-icons" onclick="irPara('cadastro_colaboradores.html')" title="Voltar ao Cadastro de Colaboradores">arrow_back</span>
+
+  <!-- Modal para Entrada de Horário -->
+  <div class="modal" id="inputModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Informe o Horário da Reunião</h3>
+      <label for="modalHorario">Horário</label>
+      <div class="horario-container">
+        <input type="text" id="modalHorario" placeholder="hh:mm" maxlength="5">
+      </div>
+      <div id="modalHorarioError" class="error-message">Por favor, informe um horário válido (ex.: 11:30).</div>
+      <button class="confirm" onclick="submitModal()"><span class="material-icons">check</span> Confirmar</button>
+      <button class="cancel" onclick="closeModal()"><span class="material-icons">close</span> Cancelar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <img id="logo-empresa" class="logo-empresa" style="display: none;" alt="Logo da Empresa">
+      <div id="logo-placeholder" class="logo-placeholder">Logo da Empresa</div>
+      <div class="header-text">
+        <div class="titulo">Eleição da CIPA</div>
+        <div class="gestao" id="gestaoText">CIPA Gestão [Ano] / [Ano + 1]</div>
+      </div>
+    </div>
+
+    <div class="preview" id="previewText" style="display: none;">[Carregando dados da lista de presença...]</div>
+
+    <div class="form-container" id="generateButton" style="display: none;">
+      <button onclick="gerarListaPresenca()"><span class="material-icons">format_list_bulleted</span> Gerar Lista de Presença</button>
+    </div>
+  </div>
+
+  <script>
+    console.log("Iniciando carregamento de ListaPresencaColaboradores.html...");
+    if (typeof docx === 'undefined') {
+      console.warn("Biblioteca docx.js não carregada inicialmente.");
+    } else {
+      console.log("Biblioteca docx.js carregada com sucesso.");
+    }
+
+    let formData = { horario: '' };
+
+    function irPara(pagina) {
+      console.log("Redirecionando para:", pagina);
+      window.location.href = pagina;
+    }
+
+    function getDataPosse() {
+      try {
+        const dataPosse = localStorage.getItem('dataPosse');
+        console.log("Data de posse carregada:", dataPosse);
+        return dataPosse;
+      } catch (e) {
+        console.error("Erro ao carregar data de posse:", e);
+        return null;
+      }
+    }
+
+    function getDataEleicao() {
+      try {
+        const dataEleicao = localStorage.getItem('dataEleicao');
+        console.log("Data da eleição carregada:", dataEleicao);
+        return dataEleicao;
+      } catch (e) {
+        console.error("Erro ao carregar data da eleição:", e);
+        return null;
+      }
+    }
+
+    function calcularDatas(dataPosse) {
+      // Priorizar dataEleicao do localStorage, se disponível
+      const dataEleicao = getDataEleicao();
+      if (dataEleicao) {
+        return { dataReuniao: dataEleicao };
+      }
+
+      // Fallback: Calcular data da eleição como dataPosse - 30 dias
+      if (!dataPosse) {
+        return { dataReuniao: null };
+      }
+
+      let dataReuniao = new Date(dataPosse);
+      dataReuniao.setDate(dataReuniao.getDate() - 30);
+      while (dataReuniao.getDay() === 0 || dataReuniao.getDay() === 6) {
+        dataReuniao.setDate(dataReuniao.getDate() - 1);
+      }
+
+      return {
+        dataReuniao: dataReuniao.toISOString().split('T')[0]
+      };
+    }
+
+    function formatarData(data) {
+      const dia = data.getDate().toString().padStart(2, '0');
+      const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+      const ano = data.getFullYear();
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    function loadEmpresaData() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa_basica')) || {};
+        console.log("Dados da empresa carregados de 'empresa_basica':", empresaData);
+        return {
+          nome: empresaData.nome || '',
+          cnpj: empresaData.cnpj || '',
+          cnae: empresaData.cnae || '',
+          endereco: empresaData.endereco || '',
+          logo: empresaData.logo || ''
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados da empresa:", e);
+        return {
+          nome: '',
+          cnpj: '',
+          cnae: '',
+          endereco: '',
+          logo: ''
+        };
+      }
+    }
+
+    function loadColaboradores() {
+      try {
+        const colaboradores = JSON.parse(localStorage.getItem('colaboradores')) || [];
+        console.log("Colaboradores carregados:", colaboradores);
+        return colaboradores;
+      } catch (e) {
+        console.error("Erro ao carregar colaboradores:", e);
+        return [];
+      }
+    }
+
+    function aplicarMascaraHorario(input) {
+      input.addEventListener('input', () => {
+        let value = input.value.replace(/\D/g, '');
+        if (value.length > 4) value = value.slice(0, 4);
+        if (value.length >= 3) {
+          value = value.slice(0, 2) + ':' + value.slice(2);
+        }
+        input.value = value;
+      });
+    }
+
+    function validarHorario(horario) {
+      if (!horario) return false;
+      const regex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+      return regex.test(horario);
+    }
+
+    function inicializarMascaraHorario() {
+      const horarioInput = document.getElementById('modalHorario');
+      if (horarioInput) {
+        aplicarMascaraHorario(horarioInput);
+
+        horarioInput.addEventListener('blur', () => {
+          if (horarioInput.value && !validarHorario(horarioInput.value)) {
+            horarioInput.classList.add('error');
+            document.getElementById('modalHorarioError').classList.add('active');
+          } else {
+            horarioInput.classList.remove('error');
+            document.getElementById('modalHorarioError').classList.remove('active');
+          }
+        });
+      }
+    }
+
+    function showModal() {
+      document.getElementById('inputModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('inputModal').style.display = 'none';
+      document.getElementById('previewText').textContent = "Por favor, informe o horário da reunião para continuar.";
+      document.getElementById('previewText').style.display = 'block';
+    }
+
+    function submitModal() {
+      console.log("Iniciando validação do modal...");
+      const horario = document.getElementById('modalHorario').value.trim();
+      const horarioError = document.getElementById('modalHorarioError');
+      let isValid = true;
+
+      if (!horario || !validarHorario(horario)) {
+        console.log("Erro: Horário inválido ou não informado:", horario);
+        horarioError.textContent = "Por favor, informe um horário válido (ex.: 11:30).";
+        horarioError.classList.add('active');
+        document.getElementById('modalHorario').classList.add('error');
+        isValid = false;
+      } else {
+        console.log("Horário válido:", horario);
+        horarioError.classList.remove('active');
+        document.getElementById('modalHorario').classList.remove('error');
+      }
+
+      if (isValid) {
+        console.log("Modal validado com sucesso. Exibindo botão e atualizando interface...");
+        formData = { horario };
+        document.getElementById('inputModal').style.display = 'none';
+        atualizarTextos();
+        document.getElementById('previewText').style.display = 'block';
+        document.getElementById('generateButton').style.display = 'flex';
+        console.log("Botão configurado para display: flex");
+      } else {
+        console.log("Validação falhou. Botão não será exibido.");
+      }
+    }
+
+    function atualizarTextos() {
+      const dataPosse = getDataPosse();
+      const { dataReuniao } = calcularDatas(dataPosse);
+      const empresaData = loadEmpresaData();
+      const colaboradores = loadColaboradores();
+      console.log("Dados recebidos:", { dataPosse, dataReuniao, empresaData, colaboradores, formData });
+
+      if (!dataPosse || !dataReuniao) {
+        document.getElementById('previewText').textContent = "Erro: Dados incompletos (falta data de posse ou data da eleição). Volte ao calendário ou à tela de eleição (Pagina6.html) e insira uma data válida.";
+        console.error("Erro: Dados incompletos:", { dataPosse, dataReuniao });
+        return;
+      }
+
+      const data = new Date(dataReuniao);
+      if (isNaN(data.getTime())) {
+        document.getElementById('previewText').textContent = "Erro: Data da eleição inválida.";
+        console.error("Erro: Data inválida:", { dataReuniao });
+        return;
+      }
+
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        document.getElementById('previewText').textContent = `Erro: Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`;
+        console.error("Erro: Dados da empresa incompletos:", missingFields);
+        return;
+      }
+
+      if (colaboradores.length === 0) {
+        document.getElementById('previewText').textContent = "Erro: Nenhum colaborador cadastrado. Por favor, cadastre colaboradores na tela de Cadastro de Colaboradores.";
+        console.error("Erro: Nenhum colaborador cadastrado.");
+        return;
+      }
+
+      const logoImg = document.getElementById('logo-empresa');
+      const logoPlaceholder = document.getElementById('logo-placeholder');
+      if (empresaData.logo) {
+        logoImg.src = empresaData.logo;
+        logoImg.style.display = 'block';
+        logoPlaceholder.style.display = 'none';
+        console.log("Logotipo carregado com sucesso.");
+      } else {
+        logoImg.style.display = 'none';
+        logoPlaceholder.style.display = 'flex';
+        console.log("Nenhum logotipo encontrado, exibindo placeholder.");
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      document.getElementById('gestaoText').textContent = `CIPA Gestão ${anoInicio} / ${anoFim}`;
+
+      const dataFormatada = formatarData(data);
+      const texto = `Lista de presença para a Eleição da CIPA da ${empresaData.nome}, realizada em ${dataFormatada} às ${formData.horario} horas.\n\nColaboradores presentes:\n${colaboradores.map(col => `- ${col.nome}`).join('\n')}`;
+      document.getElementById('previewText').textContent = texto;
+      console.log("Texto e logotipo atualizados com sucesso.");
+    }
+
+    function gerarListaPresenca() {
+      console.log("Iniciando geração da lista de presença...");
+      if (typeof docx === 'undefined') {
+        console.error("Erro: Biblioteca docx.js não carregada.");
+        alert("Erro: Não foi possível carregar a biblioteca para gerar a lista de presença. Verifique sua conexão à internet, tente outro navegador ou contate o suporte.");
+        return;
+      }
+
+      const dataPosse = getDataPosse();
+      const { dataReuniao } = calcularDatas(dataPosse);
+      const empresaData = loadEmpresaData();
+      const colaboradores = loadColaboradores();
+
+      console.log("Dados usados na lista:", { empresaData, colaboradores, formData });
+
+      if (!dataPosse || !dataReuniao) {
+        console.error("Erro ao gerar lista de presença: Dados incompletos.");
+        alert("Dados incompletos (falta data de posse ou data da eleição). Volte ao calendário ou à tela de eleição (Pagina6.html) e insira uma data válida.");
+        return;
+      }
+
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        console.error("Erro ao gerar lista de presença: Dados da empresa incompletos:", missingFields);
+        alert(`Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`);
+        return;
+      }
+
+      if (!formData.horario) {
+        console.error("Erro ao gerar lista de presença: Horário não fornecido.");
+        alert("Por favor, preencha o campo de horário necessário.");
+        return;
+      }
+
+      if (colaboradores.length === 0) {
+        console.error("Erro ao gerar lista de presença: Nenhum colaborador cadastrado.");
+        alert("Nenhum colaborador cadastrado. Por favor, cadastre colaboradores na tela de Cadastro de Colaboradores.");
+        return;
+      }
+
+      const data = new Date(dataReuniao);
+      if (isNaN(data.getTime())) {
+        console.error("Erro ao gerar lista de presença: Data da eleição inválida:", { dataReuniao });
+        alert("A data da eleição fornecida é inválida.");
+        return;
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      const dataFormatada = formatarData(data);
+
+      try {
+        function base64ToArrayBuffer(base64) {
+          const binaryString = window.atob(base64.split(',')[1]);
+          const len = binaryString.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          return bytes.buffer;
+        }
+
+        const invisibleBorders = {
+          top: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          bottom: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          left: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          right: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" }
+        };
+
+        const visibleBorders = {
+          top: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+          bottom: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+          left: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+          right: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" }
+        };
+
+        const headerChildren = [
+          new docx.Table({
+            rows: [
+              new docx.TableRow({
+                children: [
+                  new docx.TableCell({
+                    width: { size: 1000, type: docx.WidthType.DXA },
+                    children: empresaData.logo ? [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.ImageRun({
+                            data: base64ToArrayBuffer(empresaData.logo),
+                            transformation: { width: 50, height: 50 }
+                          })
+                        ],
+                        alignment: docx.AlignmentType.LEFT
+                      })
+                    ] : [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: "Logo da Empresa",
+                            size: 12,
+                            font: "Arial",
+                            color: "555555"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.LEFT
+                      })
+                    ],
+                    borders: invisibleBorders
+                  }),
+                  new docx.TableCell({
+                    width: { size: 8000, type: docx.WidthType.DXA },
+                    children: [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: "Eleição da CIPA",
+                            bold: true,
+                            size: 36,
+                            font: "Arial",
+                            color: "28A745"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.CENTER
+                      }),
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: `CIPA Gestão ${anoInicio} / ${anoFim}`,
+                            size: 20,
+                            font: "Arial",
+                            color: "555555"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.CENTER,
+                        spacing: { after: 600 }
+                      })
+                    ],
+                    borders: invisibleBorders
+                  })
+                ]
+              })
+            ],
+            width: { size: 100, type: docx.WidthType.PERCENTAGE }
+          })
+        ];
+
+        const doc = new docx.Document({
+          sections: [{
+            headers: {
+              default: new docx.Header({
+                children: headerChildren
+              })
+            },
+            properties: {},
+            children: [
+              // Tabela Superior: Título, Data, Hora
+              new docx.Table({
+                rows: [
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 1000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Título:",
+                                bold: true,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      }),
+                      new docx.TableCell({
+                        width: { size: 8000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Eleição da CIPA",
+                                bold: false,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      })
+                    ]
+                  }),
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 1000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Data:",
+                                bold: true,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      }),
+                      new docx.TableCell({
+                        width: { size: 8000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: dataFormatada,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      })
+                    ]
+                  }),
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 1000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Horário:",
+                                bold: true,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      }),
+                      new docx.TableCell({
+                        width: { size: 8000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: formData.horario + " horas",
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      })
+                    ]
+                  })
+                ],
+                width: { size: 100, type: docx.WidthType.PERCENTAGE },
+                margins: { left: 200, right: 200 },
+                spacing: { before: 0, after: 500 }
+              }),
+              // Parágrafo vazio para espaçamento após a tabela superior
+              new docx.Paragraph({
+                children: [],
+                spacing: { before: 15 }
+              }),
+              // Tabela Intermediária: Cabeçalho "Nome" e "Assinatura"
+              new docx.Table({
+                rows: [
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 5400, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Nome",
+                                bold: true,
+                                size: 20,
+                                font: "Arial",
+                                color: "FFFFFF"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER
+                          })
+                        ],
+                        borders: visibleBorders,
+                        shading: { fill: "006400" }
+                      }),
+                      new docx.TableCell({
+                        width: { size: 3600, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Assinatura",
+                                bold: true,
+                                size: 20,
+                                font: "Arial",
+                                color: "FFFFFF"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER
+                          })
+                        ],
+                        borders: visibleBorders,
+                        shading: { fill: "006400" }
+                      })
+                    ]
+                  })
+                ],
+                width: { size: 100, type: docx.WidthType.PERCENTAGE },
+                margins: { left: 200, right: 200 }
+              }),
+              // Parágrafo vazio para espaçamento antes da tabela final
+              new docx.Paragraph({
+                children: [],
+                spacing: { before: 100 }
+              }),
+              // Tabela Final: Lista de colaboradores
+              new docx.Table({
+                rows: colaboradores.map(col => new docx.TableRow({
+                  height: { value: 600, rule: docx.HeightRule.EXACT },
+                  children: [
+                    new docx.TableCell({
+                      width: { size: 5400, type: docx.WidthType.DXA },
+                      children: [
+                        new docx.Paragraph({
+                          children: [
+                            new docx.TextRun({
+                              text: col.nome,
+                              size: 24,
+                              font: "Arial"
+                            })
+                          ],
+                          alignment: docx.AlignmentType.LEFT,
+                          margins: { left: 100 }
+                        })
+                      ],
+                      borders: invisibleBorders
+                    }),
+                    new docx.TableCell({
+                      width: { size: 3600, type: docx.WidthType.DXA },
+                      children: [
+                        new docx.Paragraph({
+                          children: [
+                            new docx.TextRun({
+                              text: "____________________",
+                              size: 24,
+                              font: "Arial"
+                            })
+                          ],
+                          alignment: docx.AlignmentType.CENTER
+                        })
+                      ],
+                      borders: invisibleBorders
+                    })
+                  ]
+                })),
+                width: { size: 100, type: docx.WidthType.PERCENTAGE },
+                margins: { left: 200, right: 200 },
+                spacing: { before: 0, after: 0 }
+              })
+            ]
+          }]
+        });
+
+        console.log("Documento da lista de presença criado, iniciando download...");
+        docx.Packer.toBlob(doc).then(blob => {
+          console.log("Lista de presença gerada com sucesso.");
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Lista_Presenca_Eleicao_CIPA_${anoInicio}_${anoFim}.docx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }).catch(error => {
+          console.error("Erro ao gerar a lista de presença:", error);
+          alert("Erro ao gerar a lista de presença. Verifique o console para detalhes.");
+        });
+      } catch (error) {
+        console.error("Erro ao criar a lista de presença:", error);
+        alert("Erro ao criar a lista de presença. Verifique o console para detalhes.");
+      }
+    }
+
+    window.onload = () => {
+      console.log("Carregando ListaPresencaColaboradores.html...");
+      showModal();
+      inicializarMascaraHorario();
+    };
+  </script>
+</body>
+</html>

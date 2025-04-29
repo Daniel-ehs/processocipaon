@@ -2,96 +2,358 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Página em Construção</title>
+  <title>Apuração de Votos - CIPA</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
+      margin: 2rem;
       background-color: #f9f9f9;
       display: flex;
       flex-direction: column;
       align-items: center;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 4rem;
+    }
+    .header {
+      display: flex;
+      align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      margin-bottom: 2rem;
       text-align: center;
     }
-
-    .container {
-      padding: 2rem;
-      max-width: 600px;
-      width: 100%;
-    }
-
-    .logo-cipa {
+    .logo-empresa {
       width: 100px;
-      height: auto;
-      margin-bottom: 1rem;
+      height: 100px;
+      object-fit: contain;
+      margin-right: 1rem;
     }
-
+    .logo-placeholder {
+      width: 100px;
+      height: 100px;
+      background-color: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+      text-align: center;
+    }
+    .header-text {
+      flex: 1;
+    }
     .titulo {
       font-size: 1.8rem;
       font-weight: bold;
       color: green;
-      margin-bottom: 1rem;
+      margin: 0;
     }
-
-    .mensagem {
-      font-size: 1.2rem;
-      color: #333;
-      margin-bottom: 2rem;
-    }
-
-    .botao-voltar {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.5rem 1rem;
+    .gestao {
       font-size: 1rem;
+      color: #555;
+      margin-top: 0.5rem;
+    }
+    .form-container {
+      margin-top: 2rem;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    button {
+      padding: 0.65rem 1.3rem;
+      font-size: 1.02rem;
       background-color: green;
       color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
-      text-decoration: none;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-
-    .botao-voltar:hover {
+    button:hover {
       background-color: #005a00;
     }
-
-    .botao-voltar .material-icons {
-      margin-right: 0.5rem;
+    button .material-icons {
+      font-size: 21px;
     }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 1rem;
-      }
-
-      .titulo {
-        font-size: 1.5rem;
-      }
-
-      .mensagem {
-        font-size: 1rem;
-      }
-
-      .logo-cipa {
-        width: 80px;
-      }
+    .back-icon {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      font-size: 24px;
+      color: green;
+      cursor: pointer;
+      z-index: 1000;
+      transition: color 0.2s;
+    }
+    .back-icon:hover {
+      color: #005a00;
+    }
+    .candidates-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    .candidates-table th,
+    .candidates-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    .candidates-table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    .candidates-table td input {
+      width: 100px;
+      padding: 0.3rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: right;
+    }
+    .candidates-table td input:focus {
+      outline: none;
+      border-color: green;
+    }
+    .error-message {
+      color: #dc3545;
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
+  <!-- Ícone de Voltar Minimalista -->
+  <span id="back-icon" class="back-icon material-icons" onclick="irPara('ProcEleitoral.html')" title="Voltar ao Processo Eleitoral">arrow_back</span>
+
   <div class="container">
-    <img src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" class="logo-cipa" alt="Logo CIPA">
-    <div class="titulo">Página em Construção</div>
-    <div class="mensagem">Esta página está em desenvolvimento. Volte em breve!</div>
-    <a href="index.html" class="botao-voltar">
-      <span class="material-icons">arrow_back</span>
-      Voltar ao Calendário
-    </a>
+    <div class="header">
+      <img id="logo-empresa" class="logo-empresa" style="display: none;" alt="Logo da Empresa">
+      <div id="logo-placeholder" class="logo-placeholder">Logo da Empresa</div>
+      <div class="header-text">
+        <div class="titulo">Apuração de Votos</div>
+        <div class="gestao" id="gestaoText">CIPA Gestão [Ano] / [Ano + 1]</div>
+      </div>
+    </div>
+
+    <div id="errorMessage" class="error-message" style="display: none;"></div>
+    <table id="candidatesTable" class="candidates-table">
+      <thead>
+        <tr>
+          <th>Candidato</th>
+          <th>Votos</th>
+        </tr>
+      </thead>
+      <tbody id="candidatesBody"></tbody>
+    </table>
+
+    <div class="form-container">
+      <button onclick="ordenarCandidatos()">
+        <span class="material-icons">sort</span> Ordenar por Votos
+      </button>
+    </div>
   </div>
+
+  <script>
+    console.log("Iniciando carregamento de ApuracaoVotos.html...");
+
+    function irPara(pagina) {
+      console.log("Redirecionando para:", pagina);
+      window.location.href = pagina;
+    }
+
+    function getDataPosse() {
+      try {
+        const dataPosse = localStorage.getItem('dataPosse');
+        console.log("Data de posse carregada:", dataPosse);
+        return dataPosse;
+      } catch (e) {
+        console.error("Erro ao carregar data de posse:", e);
+        return null;
+      }
+    }
+
+    function calcularDataDivulgacao() {
+      const dataPosse = getDataPosse();
+      if (!dataPosse) {
+        return null;
+      }
+
+      const dataBase = new Date(dataPosse);
+      dataBase.setFullYear(dataBase.getFullYear() + 1);
+
+      let dataDivulgacao = new Date(dataBase);
+      dataDivulgacao.setDate(dataDivulgacao.getDate() - 34);
+      while (dataDivulgacao.getDay() === 0 || dataDivulgacao.getDay() === 6) {
+        dataDivulgacao.setDate(dataDivulgacao.getDate() - 1);
+      }
+
+      return dataDivulgacao.toISOString().split('T')[0];
+    }
+
+    function formatarDataLonga(data) {
+      const meses = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      ];
+      const dia = data.getDate().toString().padStart(2, '0');
+      const mes = meses[data.getMonth()];
+      const ano = data.getFullYear();
+      return `${dia} de ${mes} de ${ano}`;
+    }
+
+    function loadEmpresaData() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa_basica')) || {};
+        console.log("Dados da empresa carregados de 'empresa_basica':", empresaData);
+        return {
+          nome: empresaData.nome || '',
+          cnpj: empresaData.cnpj || '',
+          cnae: empresaData.cnae || '',
+          endereco: empresaData.endereco || '',
+          logo: empresaData.logo || ''
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados da empresa:", e);
+        return {
+          nome: '',
+          cnpj: '',
+          cnae: '',
+          endereco: '',
+          logo: ''
+        };
+      }
+    }
+
+    function loadCandidatosInscritos() {
+      try {
+        const candidatos = JSON.parse(localStorage.getItem('candidatosInscritos')) || [];
+        console.log("Candidatos inscritos carregados:", candidatos);
+        return candidatos;
+      } catch (e) {
+        console.error("Erro ao carregar candidatos inscritos:", e);
+        return [];
+      }
+    }
+
+    function atualizarListaCandidatos() {
+      const dataDivulgacao = calcularDataDivulgacao();
+      const empresaData = loadEmpresaData();
+      const candidatosInscritos = loadCandidatosInscritos();
+      console.log("Dados recebidos:", { dataDivulgacao, empresaData, candidatosInscritos });
+
+      const errorMessage = document.getElementById('errorMessage');
+      const candidatesTable = document.getElementById('candidatesTable');
+      const candidatesBody = document.getElementById('candidatesBody');
+
+      if (!dataDivulgacao) {
+        errorMessage.textContent = "Erro: Data de posse não encontrada. Volte à página ProcEleitoral.html e configure a data de posse.";
+        errorMessage.style.display = 'block';
+        candidatesTable.style.display = 'none';
+        console.error("Erro: Data de posse não encontrada.");
+        return;
+      }
+
+      const data = new Date(dataDivulgacao);
+      if (isNaN(data.getTime())) {
+        errorMessage.textContent = "Erro: Data de divulgação inválida.";
+        errorMessage.style.display = 'block';
+        candidatesTable.style.display = 'none';
+        console.error("Erro: Data inválida:", { dataDivulgacao });
+        return;
+      }
+
+      if (candidatosInscritos.length === 0) {
+        errorMessage.textContent = "Erro: Nenhum candidato inscrito. Por favor, insira candidatos na etapa anterior.";
+        errorMessage.style.display = 'block';
+        candidatesTable.style.display = 'none';
+        console.error("Erro: Nenhum candidato inscrito.");
+        return;
+      }
+
+      const logoImg = document.getElementById('logo-empresa');
+      const logoPlaceholder = document.getElementById('logo-placeholder');
+      if (empresaData.logo) {
+        logoImg.src = empresaData.logo;
+        logoImg.style.display = 'block';
+        logoPlaceholder.style.display = 'none';
+        console.log("Logotipo carregado com sucesso.");
+      } else {
+        logoImg.style.display = 'none';
+        logoPlaceholder.style.display = 'flex';
+        console.log("Nenhum logotipo encontrado, exibindo placeholder.");
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      document.getElementById('gestaoText').textContent = `CIPA Gestão ${anoInicio} / ${anoFim}`;
+
+      candidatesBody.innerHTML = '';
+      candidatosInscritos.forEach((candidato, index) => {
+        const nomeCompleto = candidato.apelido ? `${candidato.nome} (${candidato.apelido})` : candidato.nome;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${nomeCompleto}</td>
+          <td><input type="number" min="0" id="votos-${index}" value="0"></td>
+        `;
+        candidatesBody.appendChild(row);
+      });
+
+      errorMessage.style.display = 'none';
+      candidatesTable.style.display = 'table';
+      console.log("Lista de candidatos atualizada com sucesso.");
+    }
+
+    function ordenarCandidatos() {
+      console.log("Iniciando ordenação dos candidatos por votos...");
+      const candidatosInscritos = loadCandidatosInscritos();
+      const candidatesBody = document.getElementById('candidatesBody');
+
+      // Criar array com candidatos e votos
+      const candidatosComVotos = candidatosInscritos.map((candidato, index) => {
+        const input = document.getElementById(`votos-${index}`);
+        const votos = parseInt(input.value) || 0;
+        return {
+          nome: candidato.nome,
+          apelido: candidato.apelido || '',
+          votos: votos
+        };
+      });
+
+      // Ordenar por votos (decrescente)
+      candidatosComVotos.sort((a, b) => b.votos - a.votos);
+
+      // Atualizar tabela
+      candidatesBody.innerHTML = '';
+      candidatosComVotos.forEach((candidato, index) => {
+        const nomeCompleto = candidato.apelido ? `${candidato.nome} (${candidato.apelido})` : candidato.nome;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${nomeCompleto}</td>
+          <td><input type="number" min="0" id="votos-${index}" value="${candidato.votos}"></td>
+        `;
+        candidatesBody.appendChild(row);
+      });
+
+      console.log("Candidatos ordenados com sucesso:", candidatosComVotos);
+    }
+
+    window.onload = () => {
+      console.log("Carregando ApuracaoVotos.html...");
+      atualizarListaCandidatos();
+    };
+  </script>
 </body>
 </html>

@@ -2,9 +2,12 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Página em Construção</title>
+  <title>Cédula de Votação - CIPA (Dinâmico)</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <!-- Adicionado: Dependência para docx.js -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,85 +16,1413 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
+      padding: 1rem;
     }
 
-    .container {
-      padding: 2rem;
-      max-width: 600px;
-      width: 100%;
+    .page-container {
+      width: 210mm;
+      height: 297mm;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin: 1rem auto;
+      box-sizing: border-box;
+    }
+
+    .page-container.six-cedulas {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 0;
+    }
+
+    .page-container.four-cedulas {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 0;
+    }
+
+    .page-container.two-cedulas {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(1, 1fr);
+      gap: 0;
+    }
+
+    .cedula-container {
+      background-color: white;
+      border: 0.5mm dashed #999;
+      box-sizing: border-box;
+      padding: 4mm;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cedula-container.six-cedulas {
+      width: 105mm;
+      height: 99mm;
+    }
+
+    .cedula-container.four-cedulas {
+      width: 105mm;
+      height: 148.5mm;
+      padding: 5mm;
+    }
+
+    .cedula-container.two-cedulas {
+      width: 105mm;
+      height: 297mm;
+      padding: 6mm;
+    }
+
+    .form-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #E6F4E6;
+      padding: 0.4rem;
+      position: relative;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      border-bottom: 0.5mm solid #ccc;
     }
 
     .logo-cipa {
-      width: 100px;
-      height: auto;
-      margin-bottom: 1rem;
+      position: absolute;
+      left: 0.4rem;
+      width: 25px;
+      height: 25px;
+      object-fit: contain;
+    }
+
+    .header-text {
+      text-align: center;
+      color: #000;
     }
 
     .titulo {
-      font-size: 1.8rem;
+      font-size: 0.8rem;
       font-weight: bold;
-      color: green;
-      margin-bottom: 1rem;
+      margin: 0;
+      text-transform: uppercase;
     }
 
-    .mensagem {
-      font-size: 1.2rem;
+    .gestao {
+      font-size: 0.6rem;
+      margin-top: 0.2rem;
+    }
+
+    .instructions {
+      margin: 0.4rem 0;
+      padding: 0.4rem;
+      background-color: #f5f5f5;
+      border-left: 2px solid #28a745;
+      border-radius: 2px;
+    }
+
+    .instructions h3 {
+      margin: 0 0 0.2rem;
+      font-size: 0.7rem;
       color: #333;
-      margin-bottom: 2rem;
     }
 
-    .botao-voltar {
-      display: inline-flex;
-      align-items: center;
+    .instructions p {
+      margin: 0.1rem 0;
+      font-size: 0.6rem;
+      color: #555;
+    }
+
+    .instructions p.warning {
+      color: #dc3545;
+      font-weight: bold;
+    }
+
+    .candidates-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 0.4rem;
+    }
+
+    .candidates-table.six-cedulas {
+      font-size: 0.6rem;
+    }
+
+    .candidates-table.four-cedulas,
+    .candidates-table.two-cedulas {
+      font-size: 0.55rem;
+    }
+
+    .candidates-table th,
+    .candidates-table td {
+      border: 0.5px solid #ccc;
+    }
+
+    .candidates-table th {
+      background-color: #E6F4E6;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .candidates-table td {
+      vertical-align: middle;
+    }
+
+    .candidates-table.six-cedulas th,
+    .candidates-table.six-cedulas td {
+      padding: 0.3rem;
+    }
+
+    .candidates-table.four-cedulas th,
+    .candidates-table.four-cedulas td,
+    .candidates-table.two-cedulas th,
+    .candidates-table.two-cedulas td {
+      padding: 0.2rem;
+    }
+
+    .candidates-table th.voto,
+    .candidates-table td.voto {
+      width: 20px;
+      text-align: center;
+    }
+
+    .checkbox {
+      width: 12px;
+      height: 12px;
+      border: 0.5px solid #000;
+      display: inline-block;
+      vertical-align: middle;
+      background-color: #fff;
+      margin: 0 auto;
+    }
+
+    .candidate-info {
+      font-size: inherit;
+    }
+
+    .candidate-info strong {
+      display: block;
+      font-size: 0.65rem;
+    }
+
+    .candidate-info.four-cedulas strong,
+    .candidate-info.two-cedulas strong {
+      font-size: 0.6rem;
+    }
+
+    .candidate-info span {
+      display: block;
+      color: #555;
+    }
+
+    .no-candidates {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #666;
+      padding: 0.5rem;
+      background-color: #f9f9f9;
+      border: 0.5px solid #ccc;
+      border-radius: 2px;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-container {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    button {
       padding: 0.5rem 1rem;
-      font-size: 1rem;
-      background-color: green;
+      font-size: 0.9rem;
+      background-color: #28a745;
       color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
-      text-decoration: none;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
     }
 
-    .botao-voltar:hover {
+    button:hover {
       background-color: #005a00;
     }
 
-    .botao-voltar .material-icons {
-      margin-right: 0.5rem;
+    button .material-icons {
+      font-size: 18px;
     }
 
-    @media (max-width: 600px) {
-      .container {
-        padding: 1rem;
+    .back-icon {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      font-size: 24px;
+      color: #28a745;
+      cursor: pointer;
+      z-index: 1000;
+      transition: color 0.2s;
+    }
+
+    .back-icon:hover {
+      color: #005a00;
+    }
+
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: white;
       }
 
-      .titulo {
-        font-size: 1.5rem;
+      .page-container {
+        box-shadow: none;
+        margin: 0;
       }
 
-      .mensagem {
-        font-size: 1rem;
+      .form-container,
+      .back-icon {
+        display: none;
       }
 
-      .logo-cipa {
-        width: 80px;
+      .cedula-container {
+        border: 0.5mm dashed #999;
       }
+    }
+
+    /* Adicionado: Estilos para o modal da lista de presença */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2000;
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      position: relative;
+      background-color: white;
+      width: 320px;
+      margin: 10% auto;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .modal-content h3 {
+      margin: 0 0 1rem;
+      font-size: 1.3rem;
+      color: #333;
+    }
+
+    .modal-content label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+      font-size: 0.95rem;
+      color: #333;
+      font-weight: 500;
+      text-align: left;
+    }
+
+    .modal-content input {
+      padding: 0.5rem;
+      font-size: 0.95rem;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+
+    .modal-content input:focus {
+      outline: none;
+      border-color: #28a745;
+    }
+
+    .modal-content input.error {
+      border-color: #dc3545;
+    }
+
+    .horario-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .horario-container input {
+      width: 70px;
+      text-align: center;
+    }
+
+    .modal-content button {
+      margin-top: 1rem;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-content button:hover {
+      filter: brightness(90%);
+    }
+
+    .modal-content button.confirm {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .modal-content button.cancel {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+      display: none;
+      text-align: left;
+    }
+
+    .error-message.active {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" class="logo-cipa" alt="Logo CIPA">
-    <div class="titulo">Página em Construção</div>
-    <div class="mensagem">Esta página está em desenvolvimento. Volte em breve!</div>
-    <a href="index.html" class="botao-voltar">
-      <span class="material-icons">arrow_back</span>
-      Voltar ao Calendário
-    </a>
+  <span id="back-icon" class="back-icon material-icons" onclick="irPara('Pagina4.html')" title="Voltar à Inscrição de Candidatos">arrow_back</span>
+
+  <!-- Adicionado: Modal para entrada de horário -->
+  <div class="modal" id="inputModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Informe o Horário da Reunião</h3>
+      <label for="modalHorario">Horário</label>
+      <div class="horario-container">
+        <input type="text" id="modalHorario" placeholder="hh:mm" maxlength="5">
+      </div>
+      <div id="modalHorarioError" class="error-message">Por favor, informe um horário válido (ex.: 11:30).</div>
+      <button class="confirm" onclick="submitModalListaPresenca()"><span class="material-icons">check</span> Confirmar</button>
+      <button class="cancel" onclick="closeModalListaPresenca()"><span class="material-icons">close</span> Cancelar</button>
+    </div>
   </div>
+
+  <div class="page-container" id="pageContainer">
+    <div class="cedula-container" id="cedula1">
+      <div class="form-header">
+        <img class="logo-cipa" src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" alt="Logo da CIPA">
+        <div class="header-text">
+          <div class="titulo">CÉDULA DE VOTAÇÃO</div>
+          <div class="gestao" id="gestaoText1">CIPA Gestão [Ano] / [Ano + 1]</div>
+        </div>
+      </div>
+      <div class="instructions">
+        <h3>Instruções</h3>
+        <p>Marque um <strong>"X"</strong> na caixa ao lado de apenas <strong>um candidato</strong>.</p>
+        <p class="warning">Cédulas com mais de um voto ou identificadas serão nulas.</p>
+      </div>
+      <table class="candidates-table" id="candidatesTable1">
+        <thead>
+          <tr>
+            <th class="voto">Voto</th>
+            <th>Candidato</th>
+          </tr>
+        </thead>
+        <tbody id="candidatesBody1"></tbody>
+      </table>
+      <div id="noCandidates1" class="no-candidates" style="display: none;">Nenhum candidato.</div>
+    </div>
+
+    <div class="cedula-container" id="cedula2">
+      <div class="form-header">
+        <img class="logo-cipa" src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" alt="Logo da CIPA">
+        <div class="header-text">
+          <div class="titulo">CÉDULA DE VOTAÇÃO</div>
+          <div class="gestao" id="gestaoText2">CIPA Gestão [Ano] / [Ano + 1]</div>
+        </div>
+      </div>
+      <div class="instructions">
+        <h3>Instruções</h3>
+        <p>Marque um <strong>"X"</strong> na caixa ao lado de apenas <strong>um candidato</strong>.</p>
+        <p class="warning">Cédulas com mais de um voto ou identificadas serão nulas.</p>
+      </div>
+      <table class="candidates-table" id="candidatesTable2">
+        <thead>
+          <tr>
+            <th class="voto">Voto</th>
+            <th>Candidato</th>
+          </tr>
+        </thead>
+        <tbody id="candidatesBody2"></tbody>
+      </table>
+      <div id="noCandidates2" class="no-candidates" style="display: none;">Nenhum candidato.</div>
+    </div>
+
+    <div class="cedula-container" id="cedula3" style="display: none;">
+      <div class="form-header">
+        <img class="logo-cipa" src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" alt="Logo da CIPA">
+        <div class="header-text">
+          <div class="titulo">CÉDULA DE VOTAÇÃO</div>
+          <div class="gestao" id="gestaoText3">CIPA Gestão [Ano] / [Ano + 1]</div>
+        </div>
+      </div>
+      <div class="instructions">
+        <h3>Instruções</h3>
+        <p>Marque um <strong>"X"</strong> na caixa ao lado de apenas <strong>um candidato</strong>.</p>
+        <p class="warning">Cédulas com mais de um voto ou identificadas serão nulas.</p>
+      </div>
+      <table class="candidates-table" id="candidatesTable3">
+        <thead>
+          <tr>
+            <th class="voto">Voto</th>
+            <th>Candidato</th>
+          </tr>
+        </thead>
+        <tbody id="candidatesBody3"></tbody>
+      </table>
+      <div id="noCandidates3" class="no-candidates" style="display: none;">Nenhum candidato.</div>
+    </div>
+
+    <div class="cedula-container" id="cedula4" style="display: none;">
+      <div class="form-header">
+        <img class="logo-cipa" src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" alt="Logo da CIPA">
+        <div class="header-text">
+          <div class="titulo">CÉDULA DE VOTAÇÃO</div>
+          <div class="gestao" id="gestaoText4">CIPA Gestão [Ano] / [Ano + 1]</div>
+        </div>
+      </div>
+      <div class="instructions">
+        <h3>Instruções</h3>
+        <p>Marque um <strong>"X"</strong> na caixa ao lado de apenas <strong>um candidato</strong>.</p>
+        <p class="warning">Cédulas com mais de um voto ou identificadas serão nulas.</p>
+      </div>
+      <table class="candidates-table" id="candidatesTable4">
+        <thead>
+          <tr>
+            <th class="voto">Voto</th>
+            <th>Candidato</th>
+          </tr>
+        </thead>
+        <tbody id="candidatesBody4"></tbody>
+      </table>
+      <div id="noCandidates4" class="no-candidates" style="display: none;">Nenhum candidato.</div>
+    </div>
+
+    <div class="cedula-container" id="cedula5" style="display: none;">
+      <div class="form-header">
+        <img class="logo-cipa" src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" alt="Logo da CIPA">
+        <div class="header-text">
+          <div class="titulo">CÉDULA DE VOTAÇÃO</div>
+          <div class="gestao" id="gestaoText5">CIPA Gestão [Ano] / [Ano + 1]</div>
+        </div>
+      </div>
+      <div class="instructions">
+        <h3>Instruções</h3>
+        <p>Marque um <strong>"X"</strong> na caixa ao lado de apenas <strong>um candidato</strong>.</p>
+        <p class="warning">Cédulas com mais de um voto ou identificadas serão nulas.</p>
+      </div>
+      <table class="candidates-table" id="candidatesTable5">
+        <thead>
+          <tr>
+            <th class="voto">Voto</th>
+            <th>Candidato</th>
+          </tr>
+        </thead>
+        <tbody id="candidatesBody5"></tbody>
+      </table>
+      <div id="noCandidates5" class="no-candidates" style="display: none;">Nenhum candidato.</div>
+    </div>
+
+    <div class="cedula-container" id="cedula6" style="display: none;">
+      <div class="form-header">
+        <img class="logo-cipa" src="https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png" alt="Logo da CIPA">
+        <div class="header-text">
+          <div class="titulo">CÉDULA DE VOTAÇÃO</div>
+          <div class="gestao" id="gestaoText6">CIPA Gestão [Ano] / [Ano + 1]</div>
+        </div>
+      </div>
+      <div class="instructions">
+        <h3>Instruções</h3>
+        <p>Marque um <strong>"X"</strong> na caixa ao lado de apenas <strong>um candidato</strong>.</p>
+        <p class="warning">Cédulas com mais de um voto ou identificadas serão nulas.</p>
+      </div>
+      <table class="candidates-table" id="candidatesTable6">
+        <thead>
+          <tr>
+            <th class="voto">Voto</th>
+            <th>Candidato</th>
+          </tr>
+        </thead>
+        <tbody id="candidatesBody6"></tbody>
+      </table>
+      <div id="noCandidates6" class="no-candidates" style="display: none;">Nenhum candidato.</div>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <button onclick="gerarCedulaPDF()">
+      <span class="material-icons">file_download</span> Gerar Cédulas (PDF)
+    </button>
+    <button onclick="gerarIdentificacaoUrnaPDF()">
+      <span class="material-icons">description</span> Identificação da Urna (PDF)
+    </button>
+    <!-- Adicionado: Botão para gerar lista de presença -->
+    <button onclick="showModalListaPresenca()">
+      <span class="material-icons">format_list_bulleted</span> Gerar Lista de Presença (Word)
+    </button>
+  </div>
+
+  <script>
+    console.log("Iniciando carregamento de cedula_votacao.html...");
+
+    // Carregar candidatos do localStorage
+    let candidatosInscritos = JSON.parse(localStorage.getItem('candidatosInscritos')) || [];
+
+    function irPara(pagina) {
+      console.log("Redirecionando para:", pagina);
+      window.location.href = pagina;
+    }
+
+    function getDataPosse() {
+      try {
+        const dataPosse = localStorage.getItem('dataPosse') || "2025-06-01";
+        console.log("Data de posse carregada:", dataPosse);
+        return dataPosse;
+      } catch (e) {
+        console.error("Erro ao carregar data de posse:", e);
+        return "2025-06-01";
+      }
+    }
+
+    function calcularDatas(dataPosse) {
+      if (!dataPosse) {
+        console.error("Data de posse inválida.");
+        return { dataInscricao: null };
+      }
+
+      try {
+        const dataBase = new Date(dataPosse);
+        if (isNaN(dataBase.getTime())) {
+          console.error("Data de posse inválida:", dataPosse);
+          return { dataInscricao: null };
+        }
+
+        dataBase.setFullYear(dataBase.getFullYear() + 1);
+        let dataInscricao = new Date(dataBase);
+        dataInscricao.setDate(dataInscricao.getDate() - 45);
+
+        while (dataInscricao.getDay() === 0 || dataInscricao.getDay() === 6) {
+          dataInscricao.setDate(dataInscricao.getDate() - 1);
+        }
+
+        return {
+          dataInscricao: dataInscricao.toISOString().split('T')[0]
+        };
+      } catch (e) {
+        console.error("Erro ao calcular datas:", e);
+        return { dataInscricao: null };
+      }
+    }
+
+    function atualizarCedulas() {
+      const dataPosse = getDataPosse();
+      const { dataInscricao } = calcularDatas(dataPosse);
+
+      if (!dataPosse || !dataInscricao) {
+        alert("Erro: Dados incompletos (falta data de posse). Volte ao calendário e insira uma data de posse válida.");
+        console.error("Erro: Dados incompletos:", { dataPosse, dataInscricao });
+        return;
+      }
+
+      const data = new Date(dataInscricao);
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+
+      const pageContainer = document.getElementById('pageContainer');
+      const numCandidatos = candidatosInscritos.length;
+      let numCedulas, layoutClass;
+
+      if (numCandidatos > 25) {
+        alert("Erro: O número máximo de candidatos suportado é 25.");
+        console.error("Erro: Número de candidatos excede o limite de 25:", numCandidatos);
+        return;
+      }
+
+      if (numCandidatos <= 6) {
+        numCedulas = 6;
+        layoutClass = 'six-cedulas';
+      } else if (numCandidatos <= 14) {
+        numCedulas = 4;
+        layoutClass = 'four-cedulas';
+      } else {
+        numCedulas = 2;
+        layoutClass = 'two-cedulas';
+      }
+
+      pageContainer.className = `page-container ${layoutClass}`;
+      for (let i = 1; i <= 6; i++) {
+        const cedula = document.getElementById(`cedula${i}`);
+        const table = document.getElementById(`candidatesTable${i}`);
+        const candidateInfo = document.querySelectorAll(`#cedula${i} .candidate-info`);
+        if (i <= numCedulas) {
+          cedula.style.display = 'block';
+          cedula.className = `cedula-container ${layoutClass}`;
+          table.className = `candidates-table ${layoutClass}`;
+          candidateInfo.forEach(info => info.className = `candidate-info ${layoutClass}`);
+        } else {
+          cedula.style.display = 'none';
+        }
+      }
+
+      for (let i = 1; i <= numCedulas; i++) {
+        document.getElementById(`gestaoText${i}`).textContent = `CIPA Gestão ${anoInicio} / ${anoFim}`;
+        const tbody = document.getElementById(`candidatesBody${i}`);
+        const noCandidatesDiv = document.getElementById(`noCandidates${i}`);
+        const table = document.getElementById(`candidatesTable${i}`);
+        tbody.innerHTML = '';
+
+        if (numCandidatos === 0) {
+          noCandidatesDiv.style.display = 'block';
+          table.style.display = 'none';
+        } else {
+          noCandidatesDiv.style.display = 'none';
+          table.style.display = 'table';
+
+          candidatosInscritos.forEach(candidato => {
+            const nomeCompleto = candidato.apelido ? `${candidato.nome} (${candidato.apelido})` : candidato.nome;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td class="voto"><div class="checkbox"></div></td>
+              <td>
+                <div class="candidate-info ${layoutClass}">
+                  <strong>${nomeCompleto}</strong>
+                  <span>${candidato.setor}</span>
+                </div>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      }
+    }
+
+    function gerarCedulaPDF() {
+      console.log("Iniciando geração do PDF das cédulas de votação...");
+
+      if (candidatosInscritos.length === 0) {
+        alert("Nenhum candidato inscrito para gerar as cédulas.");
+        console.error("Erro: Nenhum candidato inscrito.");
+        return;
+      }
+
+      if (candidatosInscritos.length > 25) {
+        alert("Erro: O número máximo de candidatos suportado é 25.");
+        console.error("Erro: Número de candidatos excede o limite de 25:", candidatosInscritos.length);
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pageContainer = document.getElementById('pageContainer');
+
+      html2canvas(pageContainer, { 
+        scale: 2,
+        useCORS: true // Ativar CORS para carregar imagens externas
+      }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        doc.save(`Cedulas_Votacao_CIPA_${candidatosInscritos.length}candidatos.pdf`);
+        console.log("PDF das cédulas gerado com sucesso.");
+      }).catch(error => {
+        console.error("Erro ao gerar o PDF:", error);
+        alert("Erro ao gerar o PDF. Pode ser um problema com o carregamento do logo. Verifique o console para detalhes.");
+      });
+    }
+
+    async function gerarIdentificacaoUrnaPDF() {
+      console.log("Iniciando geração do PDF para identificação de urna...");
+
+      const dataPosse = getDataPosse();
+      const { dataInscricao } = calcularDatas(dataPosse);
+
+      if (!dataPosse || !dataInscricao) {
+        alert("Erro: Dados incompletos (falta data de posse). Volte ao calendário e insira uma data de posse válida.");
+        console.error("Erro: Dados incompletos:", { dataPosse, dataInscricao });
+        return;
+      }
+
+      const data = new Date(dataInscricao);
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+
+      // Dimensões do A4 paisagem: 297mm x 210mm
+      const pageWidth = 297;
+      const pageHeight = 210;
+      const margin = 20;
+      const rectWidth = 190;
+      const rectHeight = 60;
+      const logoWidth = 25;
+      const logoHeight = 25;
+      const logoUrl = "https://static.wixstatic.com/media/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png/v1/fill/w_576,h_572,al_c,lg_1,q_85,enc_avif,quality_auto/1f7d33_4e396e6aa9c24f91b3935e3681bbd272~mv2.png";
+
+      // Função para adicionar um retângulo com logo e texto
+      function addUrnaBox(yPosition) {
+        console.log("Adicionando retângulo na posição y:", yPosition);
+
+        // Retângulo
+        doc.setLineWidth(0.5);
+        doc.setDrawColor(40, 167, 69); // Cor #28a745
+        doc.setFillColor(255, 255, 255); // Fundo branco
+        doc.rect(
+          (pageWidth - rectWidth) / 2,
+          yPosition,
+          rectWidth,
+          rectHeight,
+          "FD"
+        );
+
+        // Logo
+        try {
+          doc.addImage(
+            logoUrl,
+            "PNG",
+            (pageWidth - rectWidth) / 2 + 10,
+            yPosition + 17,
+            logoWidth,
+            logoHeight
+          );
+          console.log("Logo adicionado com sucesso.");
+        } catch (error) {
+          console.error("Erro ao adicionar o logo:", error);
+        }
+
+        // Texto
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(24);
+        doc.setTextColor(40, 167, 69); // Verde #28a745
+        doc.text(
+          "URNA DE ELEIÇÃO DA CIPA",
+          (pageWidth / 2) + 10, // Deslocado 10mm para a direita
+          yPosition + rectHeight / 2 - 5, // Subido 5mm
+          { align: "center" }
+        );
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(22);
+        doc.setTextColor(40, 167, 69); // Verde #28a745
+        doc.text(
+          `CIPA Gestão ${anoInicio} / ${anoFim}`,
+          (pageWidth / 2) + 10, // Deslocado 10mm para a direita
+          yPosition + rectHeight / 2 + 5, // Espaçamento reduzido para 10mm
+          { align: "center" }
+        );
+      }
+
+      // Adicionar retângulos
+      addUrnaBox(margin); // Primeiro retângulo
+      addUrnaBox(margin + rectHeight + 20); // Segundo retângulo
+
+      // Salvar o PDF
+      try {
+        doc.save(`Identificacao_Urna_CIPA_${anoInicio}_${anoFim}.pdf`);
+        console.log("PDF da identificação da urna gerado com sucesso.");
+      } catch (error) {
+        console.error("Erro ao gerar o PDF:", error);
+        alert("Erro ao gerar o PDF. Verifique o console para detalhes.");
+      }
+    }
+
+    // Adicionado: Funções para gerar a lista de presença
+    let formDataListaPresenca = { horario: '' };
+
+    function getDataEleicaoListaPresenca() {
+      try {
+        const dataEleicao = localStorage.getItem('dataEleicao');
+        console.log("Data da eleição carregada:", dataEleicao);
+        return dataEleicao;
+      } catch (e) {
+        console.error("Erro ao carregar data da eleição:", e);
+        return null;
+      }
+    }
+
+    function calcularDatasListaPresenca(dataPosse) {
+      const dataEleicao = getDataEleicaoListaPresenca();
+      if (dataEleicao) {
+        return { dataReuniao: dataEleicao };
+      }
+
+      if (!dataPosse) {
+        return { dataReuniao: null };
+      }
+
+      let dataReuniao = new Date(dataPosse);
+      dataReuniao.setDate(dataReuniao.getDate() - 30);
+      while (dataReuniao.getDay() === 0 || dataReuniao.getDay() === 6) {
+        dataReuniao.setDate(dataReuniao.getDate() - 1);
+      }
+
+      return {
+        dataReuniao: dataReuniao.toISOString().split('T')[0]
+      };
+    }
+
+    function formatarDataListaPresenca(data) {
+      const dia = data.getDate().toString().padStart(2, '0');
+      const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+      const ano = data.getFullYear();
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    function loadEmpresaDataListaPresenca() {
+      try {
+        const empresaData = JSON.parse(localStorage.getItem('empresa_basica')) || {};
+        console.log("Dados da empresa carregados de 'empresa_basica':", empresaData);
+        return {
+          nome: empresaData.nome || '',
+          cnpj: empresaData.cnpj || '',
+          cnae: empresaData.cnae || '',
+          endereco: empresaData.endereco || '',
+          logo: empresaData.logo || ''
+        };
+      } catch (e) {
+        console.error("Erro ao carregar dados da empresa:", e);
+        return {
+          nome: '',
+          cnpj: '',
+          cnae: '',
+          endereco: '',
+          logo: ''
+        };
+      }
+    }
+
+    function loadColaboradoresListaPresenca() {
+      try {
+        const colaboradores = JSON.parse(localStorage.getItem('colaboradores')) || [];
+        console.log("Colaboradores carregados:", colaboradores);
+        return colaboradores;
+      } catch (e) {
+        console.error("Erro ao carregar colaboradores:", e);
+        return [];
+      }
+    }
+
+    function base64ToArrayBufferListaPresenca(base64) {
+      const binaryString = window.atob(base64.split(',')[1]);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    function aplicarMascaraHorarioListaPresenca(input) {
+      input.addEventListener('input', () => {
+        let value = input.value.replace(/\D/g, '');
+        if (value.length > 4) value = value.slice(0, 4);
+        if (value.length >= 3) {
+          value = value.slice(0, 2) + ':' + value.slice(2);
+        }
+        input.value = value;
+      });
+    }
+
+    function validarHorarioListaPresenca(horario) {
+      if (!horario) return false;
+      const regex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+      return regex.test(horario);
+    }
+
+    function inicializarMascaraHorarioListaPresenca() {
+      const horarioInput = document.getElementById('modalHorario');
+      if (horarioInput) {
+        aplicarMascaraHorarioListaPresenca(horarioInput);
+
+        horarioInput.addEventListener('blur', () => {
+          if (horarioInput.value && !validarHorarioListaPresenca(horarioInput.value)) {
+            horarioInput.classList.add('error');
+            document.getElementById('modalHorarioError').classList.add('active');
+          } else {
+            horarioInput.classList.remove('error');
+            document.getElementById('modalHorarioError').classList.remove('active');
+          }
+        });
+      }
+    }
+
+    function showModalListaPresenca() {
+      document.getElementById('inputModal').style.display = 'block';
+    }
+
+    function closeModalListaPresenca() {
+      document.getElementById('inputModal').style.display = 'none';
+      document.getElementById('modalHorario').value = '';
+      document.getElementById('modalHorarioError').classList.remove('active');
+    }
+
+    function submitModalListaPresenca() {
+      console.log("Iniciando validação do modal...");
+      const horario = document.getElementById('modalHorario').value.trim();
+      const horarioError = document.getElementById('modalHorarioError');
+      let isValid = true;
+
+      if (!horario || !validarHorarioListaPresenca(horario)) {
+        console.log("Erro: Horário inválido ou não informado:", horario);
+        horarioError.textContent = "Por favor, informe um horário válido (ex.: 11:30).";
+        horarioError.classList.add('active');
+        document.getElementById('modalHorario').classList.add('error');
+        isValid = false;
+      } else {
+        console.log("Horário válido:", horario);
+        horarioError.classList.remove('active');
+        document.getElementById('modalHorario').classList.remove('error');
+      }
+
+      if (isValid) {
+        console.log("Modal validado com sucesso. Gerando lista de presença...");
+        formDataListaPresenca = { horario };
+        document.getElementById('inputModal').style.display = 'none';
+        gerarListaPresenca();
+      } else {
+        console.log("Validação falhou.");
+      }
+    }
+
+    function gerarListaPresenca() {
+      console.log("Iniciando geração da lista de presença...");
+      if (typeof docx === 'undefined') {
+        console.error("Erro: Biblioteca docx.js não carregada.");
+        alert("Erro: Não foi possível carregar a biblioteca para gerar a lista de presença. Verifique sua conexão à internet, tente outro navegador ou contate o suporte.");
+        return;
+      }
+
+      const dataPosse = getDataPosse();
+      const { dataReuniao } = calcularDatasListaPresenca(dataPosse);
+      const empresaData = loadEmpresaDataListaPresenca();
+      const colaboradores = loadColaboradoresListaPresenca();
+
+      console.log("Dados usados na lista:", { empresaData, colaboradores, formDataListaPresenca });
+
+      if (!dataPosse || !dataReuniao) {
+        console.error("Erro ao gerar lista de presença: Dados incompletos.");
+        alert("Dados incompletos (falta data de posse ou data da eleição). Volte ao calendário ou à tela de eleição (Pagina6.html) e insira uma data válida.");
+        return;
+      }
+
+      const missingFields = [];
+      if (!empresaData.nome) missingFields.push('Nome da Empresa');
+      if (!empresaData.cnpj) missingFields.push('CNPJ');
+      if (!empresaData.cnae) missingFields.push('CNAE');
+      if (!empresaData.endereco) missingFields.push('Endereço');
+
+      if (missingFields.length > 0) {
+        console.error("Erro ao gerar lista de presença: Dados da empresa incompletos:", missingFields);
+        alert(`Dados da empresa incompletos. Campos faltando: ${missingFields.join(', ')}. Por favor, cadastre a empresa em CadEmpresa.html.`);
+        return;
+      }
+
+      if (!formDataListaPresenca.horario) {
+        console.error("Erro ao gerar lista de presença: Horário não fornecido.");
+        alert("Por favor, preencha o campo de horário necessário.");
+        return;
+      }
+
+      if (colaboradores.length === 0) {
+        console.error("Erro ao gerar lista de presença: Nenhum colaborador cadastrado.");
+        alert("Nenhum colaborador cadastrado. Por favor, cadastre colaboradores na tela de Cadastro de Colaboradores.");
+        return;
+      }
+
+      const data = new Date(dataReuniao);
+      if (isNaN(data.getTime())) {
+        console.error("Erro ao gerar lista de presença: Data da eleição inválida:", { dataReuniao });
+        alert("A data da eleição fornecida é inválida.");
+        return;
+      }
+
+      const anoInicio = data.getFullYear();
+      const anoFim = anoInicio + 1;
+      const dataFormatada = formatarDataListaPresenca(data);
+
+      try {
+        const invisibleBorders = {
+          top: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          bottom: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          left: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          right: { style: docx.BorderStyle.NONE, size: 0, color: "FFFFFF" }
+        };
+
+        const visibleBorders = {
+          top: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+          bottom: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+          left: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+          right: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" }
+        };
+
+        const headerChildren = [
+          new docx.Table({
+            rows: [
+              new docx.TableRow({
+                children: [
+                  new docx.TableCell({
+                    width: { size: 1000, type: docx.WidthType.DXA },
+                    children: empresaData.logo ? [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.ImageRun({
+                            data: base64ToArrayBufferListaPresenca(empresaData.logo),
+                            transformation: { width: 50, height: 50 }
+                          })
+                        ],
+                        alignment: docx.AlignmentType.LEFT
+                      })
+                    ] : [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: "Logo da Empresa",
+                            size: 12,
+                            font: "Arial",
+                            color: "555555"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.LEFT
+                      })
+                    ],
+                    borders: invisibleBorders
+                  }),
+                  new docx.TableCell({
+                    width: { size: 8000, type: docx.WidthType.DXA },
+                    children: [
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: "Eleição da CIPA",
+                            bold: true,
+                            size: 36,
+                            font: "Arial",
+                            color: "28A745"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.CENTER
+                      }),
+                      new docx.Paragraph({
+                        children: [
+                          new docx.TextRun({
+                            text: `CIPA Gestão ${anoInicio} / ${anoFim}`,
+                            size: 20,
+                            font: "Arial",
+                            color: "555555"
+                          })
+                        ],
+                        alignment: docx.AlignmentType.CENTER,
+                        spacing: { after: 600 }
+                      })
+                    ],
+                    borders: invisibleBorders
+                  })
+                ]
+              })
+            ],
+            width: { size: 100, type: docx.WidthType.PERCENTAGE }
+          })
+        ];
+
+        const doc = new docx.Document({
+          sections: [{
+            headers: {
+              default: new docx.Header({
+                children: headerChildren
+              })
+            },
+            properties: {},
+            children: [
+              new docx.Table({
+                rows: [
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 1000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Título:",
+                                bold: true,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      }),
+                      new docx.TableCell({
+                        width: { size: 8000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Eleição da CIPA",
+                                bold: false,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      })
+                    ]
+                  }),
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 1000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Data:",
+                                bold: true,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      }),
+                      new docx.TableCell({
+                        width: { size: 8000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: dataFormatada,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      })
+                    ]
+                  }),
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 1000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Horário:",
+                                bold: true,
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      }),
+                      new docx.TableCell({
+                        width: { size: 8000, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: formDataListaPresenca.horario + " horas",
+                                size: 24,
+                                font: "Arial"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.LEFT
+                          })
+                        ],
+                        borders: visibleBorders
+                      })
+                    ]
+                  })
+                ],
+                width: { size: 100, type: docx.WidthType.PERCENTAGE },
+                margins: { left: 200, right: 200 },
+                spacing: { before: 0, after: 500 }
+              }),
+              new docx.Paragraph({
+                children: [],
+                spacing: { before: 15 }
+              }),
+              new docx.Table({
+                rows: [
+                  new docx.TableRow({
+                    children: [
+                      new docx.TableCell({
+                        width: { size: 5400, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Nome",
+                                bold: true,
+                                size: 20,
+                                font: "Arial",
+                                color: "FFFFFF"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER
+                          })
+                        ],
+                        borders: visibleBorders,
+                        shading: { fill: "006400" }
+                      }),
+                      new docx.TableCell({
+                        width: { size: 3600, type: docx.WidthType.DXA },
+                        children: [
+                          new docx.Paragraph({
+                            children: [
+                              new docx.TextRun({
+                                text: "Assinatura",
+                                bold: true,
+                                size: 20,
+                                font: "Arial",
+                                color: "FFFFFF"
+                              })
+                            ],
+                            alignment: docx.AlignmentType.CENTER
+                          })
+                        ],
+                        borders: visibleBorders,
+                        shading: { fill: "006400" }
+                      })
+                    ]
+                  })
+                ],
+                width: { size: 100, type: docx.WidthType.PERCENTAGE },
+                margins: { left: 200, right: 200 }
+              }),
+              new docx.Paragraph({
+                children: [],
+                spacing: { before: 100 }
+              }),
+              new docx.Table({
+                rows: colaboradores.map(col => new docx.TableRow({
+                  height: { value: 600, rule: docx.HeightRule.EXACT },
+                  children: [
+                    new docx.TableCell({
+                      width: { size: 5400, type: docx.WidthType.DXA },
+                      children: [
+                        new docx.Paragraph({
+                          children: [
+                            new docx.TextRun({
+                              text: col.nome,
+                              size: 24,
+                              font: "Arial"
+                            })
+                          ],
+                          alignment: docx.AlignmentType.LEFT,
+                          margins: { left: 100 }
+                        })
+                      ],
+                      borders: invisibleBorders
+                    }),
+                    new docx.TableCell({
+                      width: { size: 3600, type: docx.WidthType.DXA },
+                      children: [
+                        new docx.Paragraph({
+                          children: [
+                            new docx.TextRun({
+                              text: "____________________",
+                              size: 24,
+                              font: "Arial"
+                            })
+                          ],
+                          alignment: docx.AlignmentType.CENTER
+                        })
+                      ],
+                      borders: invisibleBorders
+                    })
+                  ]
+                })),
+                width: { size: 100, type: docx.WidthType.PERCENTAGE },
+                margins: { left: 200, right: 200 },
+                spacing: { before: 0, after: 0 }
+              })
+            ]
+          }]
+        });
+
+        console.log("Documento da lista de presença criado, iniciando download...");
+        docx.Packer.toBlob(doc).then(blob => {
+          console.log("Lista de presença gerada com sucesso.");
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Lista_Presenca_Eleicao_CIPA_${anoInicio}_${anoFim}.docx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }).catch(error => {
+          console.error("Erro ao gerar a lista de presença:", error);
+          alert("Erro ao gerar a lista de presença. Verifique o console para detalhes.");
+        });
+      } catch (error) {
+        console.error("Erro ao criar a lista de presença:", error);
+        alert("Erro ao criar a lista de presença. Verifique o console para detalhes.");
+      }
+    }
+
+    window.onload = () => {
+      console.log("Carregando cedula_votacao.html...");
+      atualizarCedulas();
+      // Adicionado: Inicializar máscara de horário para o modal
+      inicializarMascaraHorarioListaPresenca();
+    };
+  </script>
 </body>
 </html>
